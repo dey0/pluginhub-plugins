@@ -266,7 +266,7 @@ public class CoxThievingPlugin extends Plugin {
         int tx = template >> 14 & 0x3FF;
         int ty = template >> 3 & 0x7FF;
         if (CoxUtil.getroom_type(template) == THIEVING) {
-          rot = CoxUtil.getroom_rot(template);
+          rot = CoxUtil.room_rot(template);
           if (rot == 0) {
             room_base_x = (cx - (tx & 0x3)) << 3;
             room_base_y = (cy - (ty & 0x3)) << 3;
@@ -281,7 +281,7 @@ public class CoxThievingPlugin extends Plugin {
             room_base_y = (cy - (tx & 0x3)) << 3;
           }
 
-          wind = CoxUtil.getroom_winding(template);
+          wind = CoxUtil.room_winding(template);
         }
       }
     }
