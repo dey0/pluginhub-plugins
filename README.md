@@ -11,8 +11,8 @@
 *Solves bat and poison chests, as well as tracks and displays the amount of grubs found by raiders*
 - Estimates the number of grubs found by the other players in the raid, based on the expected value
 
-![Example image](https://i.imgur.com/2Qfqj8K.png)
 ![Example image](https://i.imgur.com/7j4zAYa.png)
+![Example image](https://i.imgur.com/2Qfqj8K.png)
 
 ## CoX Vanguards
 *Highlights Vanguards of their respective color and shows their current HP*
