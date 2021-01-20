@@ -3,7 +3,6 @@ package de0.coxthieving;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.util.Arrays;
 
 import javax.inject.Inject;
 
@@ -19,6 +18,12 @@ public class ChestHighlight extends Overlay {
   private Client client;
   private CoxThievingPlugin plugin;
   private CoxThievingConfig config;
+
+  private final int A = 0x50;
+  private final Color[] palette = new Color[10];
+  private final Color pcolor = new Color(0, 255, 0, A);
+
+  private int last_gdfactor = -1;
 
   @Inject
   public ChestHighlight(Client client, CoxThievingPlugin plugin,
@@ -37,34 +42,36 @@ public class ChestHighlight extends Overlay {
       return null;
     byte[][] solns = ChestData.CHEST_SOLNS[plugin.wind][plugin.rot];
     byte[][] locs = ChestData.CHEST_LOCS[plugin.wind];
-    int[] rgb = new int[10];
-    if (config.gumdropFactor() != 0) {
-      float factor = config.gumdropFactor() / 20.0f;
-      float cols[] = new float[3];
-      Color.RGBtoHSB(255, 255, 0, cols);
-      cols[2] = 0.9f;
-      rgb[0] = Color.HSBtoRGB(cols[0] + factor * -1.0f, cols[1], cols[2]);
-      rgb[1] = Color.HSBtoRGB(cols[0] + factor * -0.8f, cols[1], cols[2]);
-      rgb[2] = Color.HSBtoRGB(cols[0] + factor * -0.6f, cols[1], cols[2]);
-      rgb[3] = Color.HSBtoRGB(cols[0] + factor * -0.4f, cols[1], cols[2]);
-      rgb[4] = Color.HSBtoRGB(cols[0] + factor * -0.2f, cols[1], cols[2]);
-      rgb[5] = 0xffffff;
-      rgb[6] = Color.HSBtoRGB(cols[0] + factor * 0.2f, cols[1], cols[2]);
-      rgb[7] = Color.HSBtoRGB(cols[0] + factor * 0.4f, cols[1], cols[2]);
-      rgb[8] = Color.HSBtoRGB(cols[0] + factor * 0.6f, cols[1], cols[2]);
-      rgb[9] = Color.HSBtoRGB(cols[0] + factor * 0.8f, cols[1], cols[2]);
-    } else {
-      Arrays.fill(rgb, 0xffff00);
+    int gdfactor = config.gumdropFactor();
+    if (gdfactor != last_gdfactor) {
+      final float h0 = 1f / 6f;
+      final float hf = gdfactor / 20.0f;
+      final float s = 0.95f;
+      final float b = 0.80f;
+      int[] rgb = new int[10];
+      rgb[0] = Color.HSBtoRGB(h0 + hf * -1.0f, s, b);
+      rgb[1] = Color.HSBtoRGB(h0 + hf * -0.8f, s, b);
+      rgb[2] = Color.HSBtoRGB(h0 + hf * -0.6f, s, b);
+      rgb[3] = Color.HSBtoRGB(h0 + hf * -0.4f, s, b);
+      rgb[4] = Color.HSBtoRGB(h0 + hf * -0.2f, s, b);
+      rgb[5] = Color.HSBtoRGB(h0, s, b);
+      rgb[6] = Color.HSBtoRGB(h0 + hf * 0.2f, s, b);
+      rgb[7] = Color.HSBtoRGB(h0 + hf * 0.4f, s, b);
+      rgb[8] = Color.HSBtoRGB(h0 + hf * 0.6f, s, b);
+      rgb[9] = Color.HSBtoRGB(h0 + hf * 0.8f, s, b);
+      for (int i = 0; i < 10; i++) {
+        palette[i] = new Color(A << 24 | rgb[i] & 0xffffff, true);
+      }
+      last_gdfactor = gdfactor;
     }
     if (plugin.soln == -1) {
       for (byte n = 0; n < solns.length; n++) {
         if (plugin.not_solns.contains(n))
           continue;
-        Color col = new Color(rgb[n] & 0xffffff | 0x50000000, true);
         for (int i = 0; i < 4; i++) {
           Tile t = findChest(locs[solns[n][i] - 1], plugin.rot);
           if (t != null)
-            highlightChest(t, col, g);
+            highlightChest(t, palette[n], g);
         }
       }
     } else {
@@ -72,7 +79,7 @@ public class ChestHighlight extends Overlay {
       for (int i = 0; i < b.length; i++) {
         Tile t = findChest(locs[b[i] - 1], plugin.rot);
         if (t != null) // tile outside of view
-          highlightChest(t, new Color(0, 255, 0, 50), g);
+          highlightChest(t, pcolor, g);
       }
     }
     return null;
@@ -82,7 +89,8 @@ public class ChestHighlight extends Overlay {
     GameObject chest = t.getGameObjects()[0];
     if (chest == null)
       return;
-    if (chest.getId() == CoxThievingPlugin.CCHEST || chest.getId() == CoxThievingPlugin.PCHEST) {
+    if (chest.getId() == CoxThievingPlugin.CCHEST
+        || chest.getId() == CoxThievingPlugin.PCHEST) {
       g.setColor(c);
       if (chest.getCanvasLocation() != null)
         g.fill(chest.getConvexHull());

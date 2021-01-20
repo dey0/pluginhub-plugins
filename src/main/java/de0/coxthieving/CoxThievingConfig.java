@@ -17,7 +17,7 @@ public interface CoxThievingConfig extends Config {
     return 0;
   }
 
-  @ConfigItem(keyName = "grubRate", name = "Average grubs per chest", description = "Average grubs per chest that contained some, for use in count estimation")
+  @ConfigItem(keyName = "grubRate", name = "Expected Grubs per Chest", description = "Average grubs per chest that contained some, for use in team count estimation")
   default int grubRate() {
     return 225;
   }
