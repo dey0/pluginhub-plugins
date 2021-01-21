@@ -48,8 +48,9 @@ public class LoadingLinesOverlay extends Overlay {
     WorldPoint wp = client.getLocalPlayer().getWorldLocation();
     int curr_x = wp.getX() - client.getBaseX();
     int curr_y = wp.getY() - client.getBaseY();
+    int[][] t = client.getInstanceTemplateChunks()[client.getPlane()];
 
-    final int draw_dist = 24;
+    final int draw_dist = config.drawDistance();
 
     int min_x = Math.max(curr_x - draw_dist, 16);
     int max_x = Math.min(curr_x + draw_dist, 88);
@@ -59,6 +60,8 @@ public class LoadingLinesOverlay extends Overlay {
     for (int y = min_y; y < max_y; y++) {
       int x = 16;
       if (x >= min_x) {
+        if (t[x / 8][y / 8] == -1 || t[(x - 1) / 8][y / 8] == -1)
+          continue;
         int fl1 = cmap.getFlags()[x][y];
         int fl2 = cmap.getFlags()[x - 1][y];
         if ((fl1 & MASK_W) == 0 && (fl2 & MASK_E) == 0)
@@ -67,6 +70,8 @@ public class LoadingLinesOverlay extends Overlay {
 
       x = 88;
       if (x <= max_x) {
+        if (t[(x - 1) / 8][y / 8] == -1 || t[x / 8][y / 8] == -1)
+          continue;
         int fl1 = cmap.getFlags()[x - 1][y];
         int fl2 = cmap.getFlags()[x][y];
         if ((fl1 & MASK_E) == 0 && (fl2 & MASK_W) == 0)
@@ -76,6 +81,8 @@ public class LoadingLinesOverlay extends Overlay {
     for (int x = min_x; x < max_x; x++) {
       int y = 16;
       if (y >= min_y) {
+        if (t[x / 8][y / 8] == -1 || t[x / 8][(y - 1) / 8] == -1)
+          continue;
         int fl1 = cmap.getFlags()[x][y];
         int fl2 = cmap.getFlags()[x][y - 1];
         if ((fl1 & MASK_S) == 0 && (fl2 & MASK_N) == 0)
@@ -84,6 +91,8 @@ public class LoadingLinesOverlay extends Overlay {
 
       y = 88;
       if (y <= max_y) {
+        if (t[x / 8][(y - 1) / 8] == -1 || t[x / 8][y / 8] == -1)
+          continue;
         int fl1 = cmap.getFlags()[x][y - 1];
         int fl2 = cmap.getFlags()[x][y];
         if ((fl1 & MASK_N) == 0 && (fl2 & MASK_S) == 0)

@@ -16,4 +16,9 @@ public interface LoadingLinesConfig extends Config {
     return new Color(0, 255, 87, 111);
   }
 
+  @ConfigItem(name = "Draw distance", description = "", keyName = "drawDistance")
+  default int drawDistance() {
+    return 24;
+  }
+
 }
