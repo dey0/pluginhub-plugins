@@ -30,7 +30,7 @@ public class CoxTimersPlugin extends Plugin {
 
   // Room state
   private boolean in_raid;
-  private int prvtime, prvfltime;
+  private int split, split_fl, split_sub; // Splits for room/floor/sub-room
   private int cryp[] = new int[16], cryx[] = new int[16], cryy[] = new int[16];
 
   // Olm state
@@ -50,8 +50,9 @@ public class CoxTimersPlugin extends Plugin {
     }
     if (!in_raid) {
       in_raid = true;
-      prvtime = 0;
-      prvfltime = 0;
+      split = 0;
+      split_fl = 0;
+      split_sub = 0;
       olm_phase = ~0;
       iceout = false;
       treecut = false;
@@ -72,13 +73,13 @@ public class CoxTimersPlugin extends Plugin {
         mes.append(getroom_sort(i) == 'C' ? "Combat room `" : "Puzzle `");
         mes.append(getroom_name(i));
         mes.append("` complete! Duration: <col=ff0000>");
-        mes.append(MiscUtil.to_mmss(clock() - prvtime));
+        mes.append(to_mmss(clock() - split));
         mes.append("</col> Total: <col=ff0000>");
-        mes.append(MiscUtil.to_mmss(clock()));
+        mes.append(to_mmss(clock()));
         mes.append("</col>");
 
         fc_mes(mes.toString());
-        prvtime = clock();
+        split = clock();
         this.cryp[i] = -1;
       }
     }
@@ -101,16 +102,15 @@ public class CoxTimersPlugin extends Plugin {
 
       if (is_olm_time) {
         e.getMessageNode().setValue(mes + " Olm duration: <col=ff0000>"
-            + MiscUtil.to_mmss(clock() - prvfltime) + "</col>");
+            + to_mmss(clock() - split_fl) + "</col>");
       } else if (!is_top_floor) {
         String before = mes.substring(0, duration + FL_COMPLETE_MES.length());
         String after = mes.substring(duration + FL_COMPLETE_MES.length());
-        e.getMessageNode()
-            .setValue(before + MiscUtil.to_mmss(clock() - prvfltime)
-                + "</col> Total: <col=ff0000>" + after);
+        e.getMessageNode().setValue(before + to_mmss(clock() - split_fl)
+            + "</col> Total: <col=ff0000>" + after);
       }
 
-      prvtime = prvfltime = clock();
+      split = split_fl = clock();
     } else if (e.getType() == ChatMessageType.GAMEMESSAGE && mes
         .equals("The Great Olm is giving its all. This is its final stand.")) {
       splitphase();
@@ -127,16 +127,16 @@ public class CoxTimersPlugin extends Plugin {
       mes.append(++olm_phase);
     }
     mes.append(" duration: <col=ff0000>");
-    mes.append(MiscUtil.to_mmss(clock() - prvtime));
+    mes.append(to_mmss(clock() - split));
     mes.append("</col>");
     if (olm_phase != 99) {
       mes.append(" Total: <col=ff0000>");
-      mes.append(MiscUtil.to_mmss(clock()));
+      mes.append(to_mmss(clock()));
       mes.append("</col>");
     }
 
     fc_mes(mes.toString());
-    prvtime = clock();
+    split = clock();
   }
 
   @Subscribe
@@ -145,18 +145,23 @@ public class CoxTimersPlugin extends Plugin {
     switch (go.getId()) {
     case 29881: // Olm spawned
       if (olm_phase < 0) {
-        prvtime = clock();
+        split = clock();
         olm_phase = ~olm_phase;
       }
       break;
+    case 29767:
+      // Muttadile tendrils spawned
+      split_sub = clock();
+      break;
     case 30013:
+      // Muttadile tree placeholder spawned after tree cut
       if (!treecut) {
         StringBuilder mes = new StringBuilder(
             "Muttadile tree cut duration: <col=ff0000>");
-        mes.append(MiscUtil.to_mmss(clock() - prvtime));
+        mes.append(to_mmss(clock() - split_sub));
         mes.append("</col>");
         mes.append(" Total: <col=ff0000>");
-        mes.append(MiscUtil.to_mmss(clock()));
+        mes.append(to_mmss(clock()));
         mes.append("</col>");
         fc_mes(mes.toString());
         treecut = true;
@@ -213,10 +218,10 @@ public class CoxTimersPlugin extends Plugin {
       if (CoxUtil.getroom_type(template) == ICE_DEMON) {
         StringBuilder mes = new StringBuilder(
             "Ice Demon pop duration: <col=ff0000>");
-        mes.append(MiscUtil.to_mmss(clock() - prvtime));
+        mes.append(to_mmss(clock() - split));
         mes.append("</col>");
         mes.append(" Total: <col=ff0000>");
-        mes.append(MiscUtil.to_mmss(clock()));
+        mes.append(to_mmss(clock()));
         mes.append("</col>");
         fc_mes(mes.toString());
         iceout = true;
@@ -231,6 +236,13 @@ public class CoxTimersPlugin extends Plugin {
 
   private int clock() {
     return client.getVarbitValue(6386);
+  }
+
+  private String to_mmss(int ticks) {
+    if (client.getVarbitValue(11866) == 1)
+      return MiscUtil.to_mmss_precise(ticks);
+
+    return MiscUtil.to_mmss(ticks);
   }
 
 }
