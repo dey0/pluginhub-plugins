@@ -4,6 +4,8 @@ import static de0.util.CoxUtil.*;
 
 import javax.inject.Inject;
 
+import com.google.inject.Provides;
+
 import de0.util.CoxUtil;
 import de0.util.MiscUtil;
 import net.runelite.api.ChatMessageType;
@@ -18,6 +20,7 @@ import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GraphicsObjectCreated;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -27,6 +30,9 @@ public class CoxTimersPlugin extends Plugin {
 
   @Inject
   private Client client;
+
+  @Inject
+  private CoxTimersConfig config;
 
   // Room state
   private boolean in_raid;
@@ -38,6 +44,11 @@ public class CoxTimersPlugin extends Plugin {
 
   // Misc state
   private boolean iceout, treecut;
+
+  @Provides
+  CoxTimersConfig provideConfig(ConfigManager configManager) {
+    return configManager.getConfig(CoxTimersConfig.class);
+  }
 
   @Subscribe
   public void onClientTick(ClientTick e) {
@@ -79,7 +90,7 @@ public class CoxTimersPlugin extends Plugin {
         mes.append("</col>");
 
         fc_mes(mes.toString());
-        split = clock();
+        split = split_sub = clock();
         this.cryp[i] = -1;
       }
     }
@@ -110,7 +121,7 @@ public class CoxTimersPlugin extends Plugin {
             + "</col> Total: <col=ff0000>" + after);
       }
 
-      split = split_fl = clock();
+      split = split_sub = split_fl = clock();
     } else if (e.getType() == ChatMessageType.GAMEMESSAGE && mes
         .equals("The Great Olm is giving its all. This is its final stand.")) {
       splitphase();
@@ -150,12 +161,13 @@ public class CoxTimersPlugin extends Plugin {
       }
       break;
     case 29767:
-      // Muttadile tendrils spawned
-      split_sub = clock();
+      // Muttadile tendrils spawned (only use for regs)
+      if (client.getVarbitValue(6385) == 0)
+        split_sub = clock();
       break;
     case 30013:
       // Muttadile tree placeholder spawned after tree cut
-      if (!treecut) {
+      if (config.showMuttadileTreeCutTime() && !treecut) {
         StringBuilder mes = new StringBuilder(
             "Muttadile tree cut duration: <col=ff0000>");
         mes.append(to_mmss(clock() - split_sub));
@@ -208,7 +220,8 @@ public class CoxTimersPlugin extends Plugin {
 
   @Subscribe
   public void onGraphicsObjectCreated(GraphicsObjectCreated e) {
-    if (e.getGraphicsObject().getId() == SMOKE_PUFF && !iceout) {
+    if (config.showIcePopTime() && e.getGraphicsObject().getId() == SMOKE_PUFF
+        && !iceout) {
       WorldPoint wp = WorldPoint.fromLocal(client,
           e.getGraphicsObject().getLocation());
       int p = client.getPlane();
@@ -239,7 +252,11 @@ public class CoxTimersPlugin extends Plugin {
   }
 
   private String to_mmss(int ticks) {
-    if (client.getVarbitValue(11866) == 1)
+    PreciseTimersSetting setting = config.preciseTimers();
+    boolean ingame_setting = client.getVarbitValue(11866) == 1;
+    if (setting == PreciseTimersSetting.TICK_PRECISION
+        || (setting == PreciseTimersSetting.RESPECT_INGAME_SETTING
+            && ingame_setting))
       return MiscUtil.to_mmss_precise(ticks);
 
     return MiscUtil.to_mmss(ticks);
