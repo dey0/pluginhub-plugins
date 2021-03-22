@@ -11,13 +11,18 @@ public interface CoxTimersConfig extends Config {
   default PreciseTimersSetting preciseTimers() {
     return PreciseTimersSetting.RESPECT_INGAME_SETTING;
   }
-  
+
   @ConfigItem(position = 1, keyName = "showIcePopTime", name = "Time Ice demon pop-out", description = "Partial room timer for Ice Demon")
   default boolean showIcePopTime() {
     return true;
   }
-  
-  @ConfigItem(position = 2, keyName = "showMuttadileTreeCutTime", name = "Time Muttadile tree cut", description = "Partial room timer for Muttadiles")
+
+  @ConfigItem(position = 2, keyName = "showOlmPhaseTimers", name = "Time Olm phases", description = "Phase timers for Olm")
+  default boolean showOlmPhaseTimers() {
+    return true;
+  }
+
+  @ConfigItem(position = 3, keyName = "showMuttadileTreeCutTime", name = "Time Muttadile tree cut", description = "Partial room timer for Muttadiles")
   default boolean showMuttadileTreeCutTime() {
     return true;
   }

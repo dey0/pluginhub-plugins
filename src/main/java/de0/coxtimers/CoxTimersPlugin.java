@@ -122,8 +122,9 @@ public class CoxTimersPlugin extends Plugin {
       }
 
       split = split_sub = split_fl = clock();
-    } else if (e.getType() == ChatMessageType.GAMEMESSAGE && mes
-        .equals("The Great Olm is giving its all. This is its final stand.")) {
+    } else if (config.showOlmPhaseTimers()
+        && e.getType() == ChatMessageType.GAMEMESSAGE && mes.equals(
+            "The Great Olm is giving its all. This is its final stand.")) {
       splitphase();
       olm_phase = 99;
     }
@@ -210,7 +211,8 @@ public class CoxTimersPlugin extends Plugin {
 
   @Subscribe
   public void onGameObjectDespawned(GameObjectDespawned e) {
-    if (e.getGameObject().getId() == ObjectID.LARGE_HOLE_29881) {
+    if (config.showOlmPhaseTimers()
+        && e.getGameObject().getId() == ObjectID.LARGE_HOLE_29881) {
       splitphase();
       olm_phase = ~olm_phase;
     }
