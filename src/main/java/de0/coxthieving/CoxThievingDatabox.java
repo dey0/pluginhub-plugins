@@ -10,17 +10,15 @@ import java.util.List;
 import javax.inject.Inject;
 
 import de0.coxthieving.CoxThievingPlugin.GrubCollection;
-import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.components.LayoutableRenderableEntity;
 import net.runelite.client.ui.overlay.components.LineComponent;
-import net.runelite.client.ui.overlay.components.PanelComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 
-public class CoxThievingDatabox extends Overlay {
+public class CoxThievingDatabox extends OverlayPanel {
 
   private CoxThievingPlugin plugin;
   private CoxThievingConfig config;
-  private PanelComponent panelComponent = new PanelComponent();
 
   @Inject
   public CoxThievingDatabox(CoxThievingPlugin plugin, CoxThievingConfig config) {
@@ -45,7 +43,6 @@ public class CoxThievingDatabox extends Overlay {
       sum_grubs += plugin.gc_others[i].num_with_grubs * config.grubRate() / 100;
 
     List<LayoutableRenderableEntity> elems = panelComponent.getChildren();
-    elems.clear();
     elems.add(TitleComponent.builder().color(Color.WHITE).text(
         (sum_grubs == plugin.num_grubs ? "Grub count: " : "Est. grub count: ")
             + sum_grubs)
@@ -57,7 +54,7 @@ public class CoxThievingDatabox extends Overlay {
     }
     if (myindex == plugin.gc_others_count)
       add_gc_line(elems, plugin.gc_local);
-    return this.panelComponent.render(graphics);
+    return super.render(graphics);
   }
 
   private void add_gc_line(List<LayoutableRenderableEntity> elems,
