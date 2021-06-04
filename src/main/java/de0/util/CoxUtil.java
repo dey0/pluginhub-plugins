@@ -112,13 +112,12 @@ public class CoxUtil {
 
   public static final int UNKNOWN = 17;
 
-  private static final char[] ROOM_SORTS = new char[] { '*', '*', 'S', 'F', 'C',
-      'C', 'C', 'C', 'C', 'C', 'C', 'C', 'P', 'P', 'P', 'P', 'O' };
+  private static final char[] ROOM_SORTS = new char[] { '*', '*', 'S', 'F', 'C', 'C', 'C', 'C', 'C',
+      'C', 'C', 'C', 'P', 'P', 'P', 'P', 'O' };
 
-  private static final String[] ROOM_NAMES = new String[] { "Floor start",
-      "Floor end", "Scavengers", "Farming", "Shamans", "Vasa", "Vanguards",
-      "Mystics", "Tekton", "Muttadiles", "Guardians", "Vespula", "Ice demon",
-      "Thieving", "Tightrope", "Crabs", "Olm" };
+  private static final String[] ROOM_NAMES = new String[] { "Floor start", "Floor end",
+      "Scavengers", "Farming", "Shamans", "Vasa", "Vanguards", "Mystics", "Tekton", "Muttadiles",
+      "Guardians", "Vespula", "Ice demon", "Thieving", "Tightrope", "Crabs", "Olm" };
 
   public static int getroom_type(int zonecode) {
     switch (zonecode & COX_ROOM_MASK) {
@@ -200,22 +199,19 @@ public class CoxUtil {
       return CRABS;
     }
 
-    if ((zonecode & OLM_ROOM_MASK) == OLM_)
-      return OLM;
+    if ((zonecode & OLM_ROOM_MASK) == OLM_) return OLM;
 
     return UNKNOWN;
   }
 
   public static char getroom_sort(int roomtype) {
-    if (roomtype >= 0 && roomtype < UNKNOWN)
-      return ROOM_SORTS[roomtype];
+    if (roomtype >= 0 && roomtype < UNKNOWN) return ROOM_SORTS[roomtype];
 
     return '?';
   }
 
   public static String getroom_name(int roomtype) {
-    if (roomtype >= 0 && roomtype < UNKNOWN)
-      return ROOM_NAMES[roomtype];
+    if (roomtype >= 0 && roomtype < UNKNOWN) return ROOM_NAMES[roomtype];
 
     return "Unknown";
   }

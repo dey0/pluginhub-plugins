@@ -31,13 +31,10 @@ public class ScavHighlight extends Overlay {
   public Dimension render(Graphics2D g) {
     NPC scav = null;
     for (NPC npc : client.getNpcs()) {
-      if (npc == null)
-        continue;
-      if (npc.getId() == 7602 || npc.getId() == 7603)
-        scav = npc;
+      if (npc == null) continue;
+      if (npc.getId() == 7602 || npc.getId() == 7603) scav = npc;
     }
-    if (scav == null)
-      return null;
+    if (scav == null) return null;
 
     g.setFont(FontManager.getRunescapeBoldFont());
     String str;
@@ -47,8 +44,7 @@ public class ScavHighlight extends Overlay {
       str = scav.getHealthRatio() + "%";
     }
     Point point = scav.getCanvasTextLocation(g, str, scav.getLogicalHeight());
-    if (point == null)
-      return null;
+    if (point == null) return null;
     point = new Point(point.getX(), point.getY() + 20);
     OverlayUtil.renderTextLocation(g, point, str, Color.GREEN);
     return null;

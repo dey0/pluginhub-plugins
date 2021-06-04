@@ -26,8 +26,7 @@ public class ChestHighlight extends Overlay {
   private int last_gdfactor = -1;
 
   @Inject
-  public ChestHighlight(Client client, CoxThievingPlugin plugin,
-      CoxThievingConfig config) {
+  public ChestHighlight(Client client, CoxThievingPlugin plugin, CoxThievingConfig config) {
     super(plugin);
     this.client = client;
     this.plugin = plugin;
@@ -38,8 +37,7 @@ public class ChestHighlight extends Overlay {
 
   @Override
   public Dimension render(Graphics2D g) {
-    if (!config.highlightBatChests())
-      return null;
+    if (!config.highlightBatChests()) return null;
     byte[][] solns = ChestData.CHEST_SOLNS[plugin.wind][plugin.rot];
     byte[][] locs = ChestData.CHEST_LOCS[plugin.wind];
     int gdfactor = config.gumdropFactor();
@@ -66,12 +64,10 @@ public class ChestHighlight extends Overlay {
     }
     if (plugin.soln == -1) {
       for (byte n = 0; n < solns.length; n++) {
-        if (plugin.not_solns.contains(n))
-          continue;
+        if (plugin.not_solns.contains(n)) continue;
         for (int i = 0; i < 4; i++) {
           Tile t = findChest(locs[solns[n][i] - 1], plugin.rot);
-          if (t != null)
-            highlightChest(t, palette[n], g);
+          if (t != null) highlightChest(t, palette[n], g);
         }
       }
     } else {
@@ -87,13 +83,10 @@ public class ChestHighlight extends Overlay {
 
   private void highlightChest(Tile t, Color c, Graphics2D g) {
     GameObject chest = t.getGameObjects()[0];
-    if (chest == null)
-      return;
-    if (chest.getId() == CoxThievingPlugin.CCHEST
-        || chest.getId() == CoxThievingPlugin.PCHEST) {
+    if (chest == null) return;
+    if (chest.getId() == CoxThievingPlugin.CCHEST || chest.getId() == CoxThievingPlugin.PCHEST) {
       g.setColor(c);
-      if (chest.getCanvasLocation() != null)
-        g.fill(chest.getConvexHull());
+      if (chest.getCanvasLocation() != null) g.fill(chest.getConvexHull());
     }
   }
 
@@ -116,8 +109,7 @@ public class ChestHighlight extends Overlay {
       chestX -= ry;
       chestY += rx;
     }
-    if (chestX < 0 || chestY < 0 || chestX >= 104 || chestY >= 104)
-      return null;
+    if (chestX < 0 || chestY < 0 || chestX >= 104 || chestY >= 104) return null;
     return client.getScene().getTiles()[client.getPlane()][chestX][chestY];
   }
 

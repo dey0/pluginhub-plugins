@@ -35,21 +35,16 @@ public class CoxVanguardsHighlight extends Overlay {
   @Override
   public Dimension render(Graphics2D g) {
     if (plugin.melee != null)
-      renderVanguard(plugin.melee, plugin.melhp, plugin.melhp_fine, g,
-          config.getMeleeColor());
+      renderVanguard(plugin.melee, plugin.melhp, plugin.melhp_fine, g, config.getMeleeColor());
     if (plugin.range != null)
-      renderVanguard(plugin.range, plugin.rnghp, plugin.rnghp_fine, g,
-          config.getRangeColor());
-    if (plugin.mage != null)
-      renderVanguard(plugin.mage, plugin.maghp, plugin.maghp_fine, g,
-          config.getMageColor());
+      renderVanguard(plugin.range, plugin.rnghp, plugin.rnghp_fine, g, config.getRangeColor());
+    if (plugin.magic != null)
+      renderVanguard(plugin.magic, plugin.maghp, plugin.maghp_fine, g, config.getMageColor());
     return null;
   }
 
-  private void renderVanguard(NPC van, int last_hp, int hp_fine, Graphics2D g,
-      Color c) {
-    if (van.getId() < 7525 || van.getId() > 7529)
-      return;
+  private void renderVanguard(NPC van, int last_hp, int hp_fine, Graphics2D g, Color c) {
+    if (van.getId() < 7525 || van.getId() > 7529) return;
 
     if (config.highlight()) {
       Shape s = van.getConvexHull();
@@ -78,8 +73,7 @@ public class CoxVanguardsHighlight extends Overlay {
       }
     } else if (config.showHps()) {
       int hp = van.getHealthRatio();
-      if (hp < 0)
-        hp = last_hp;
+      if (hp < 0) hp = last_hp;
       int hpPercent = hp * 100 / 30;
       String str = Integer.toString(hpPercent);
       npctext(g, van, str, c);
@@ -88,8 +82,7 @@ public class CoxVanguardsHighlight extends Overlay {
 
   private void npctext(Graphics2D g, NPC npc, String str, Color c) {
     Point point = npc.getCanvasTextLocation(g, str, npc.getLogicalHeight());
-    if (point == null)
-      return;
+    if (point == null) return;
     point = new Point(point.getX(), point.getY() + 20);
     g.setFont(FontManager.getRunescapeBoldFont());
     OverlayUtil.renderTextLocation(g, point, str, c);

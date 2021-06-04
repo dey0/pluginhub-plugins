@@ -52,8 +52,7 @@ public class CoxTimersPlugin extends Plugin {
 
   @Subscribe
   public void onClientTick(ClientTick e) {
-    if (client.getGameState() != GameState.LOGGED_IN)
-      return;
+    if (client.getGameState() != GameState.LOGGED_IN) return;
 
     if (clock() == 0 || !client.isInInstancedRegion()) {
       in_raid = false;
@@ -69,8 +68,7 @@ public class CoxTimersPlugin extends Plugin {
       treecut = false;
     }
     for (int i = 0; i < 16; i++) {
-      if (this.cryp[i] == -1)
-        continue;
+      if (this.cryp[i] == -1) continue;
       int p = cryp[i];
       int x = cryx[i] - client.getBaseX();
       int y = cryy[i] - client.getBaseY();
@@ -100,34 +98,31 @@ public class CoxTimersPlugin extends Plugin {
 
   @Subscribe
   public void onChatMessage(ChatMessage e) {
-    String mes = e.getMessage();
-    if (e.getType() == ChatMessageType.FRIENDSCHATNOTIFICATION
-        && mes.startsWith("<col=ef20ff>")) {
+    String mes = e.getMessageNode().getValue();
+    if (e.getType() == ChatMessageType.FRIENDSCHATNOTIFICATION && mes.startsWith("<col=ef20ff>")) {
       int duration = mes.indexOf(FL_COMPLETE_MES);
       boolean is_fl_time = duration != -1;
       boolean is_olm_time = mes.contains("<br>");
       boolean is_top_floor = mes.contains("Upper");
 
-      if (!is_fl_time && !is_olm_time)
-        return;
+      if (!is_fl_time && !is_olm_time) return;
 
       if (is_olm_time) {
-        e.getMessageNode().setValue(mes + " Olm duration: <col=ff0000>"
-            + to_mmss(clock() - split_fl) + "</col>");
+        e.getMessageNode()
+            .setValue(mes + " Olm duration: <col=ff0000>" + to_mmss(clock() - split_fl) + "</col>");
       } else if (!is_top_floor) {
         String before = mes.substring(0, duration + FL_COMPLETE_MES.length());
         String after = mes.substring(duration + FL_COMPLETE_MES.length());
-        e.getMessageNode().setValue(before + to_mmss(clock() - split_fl)
-            + "</col> Total: <col=ff0000>" + after);
+        e.getMessageNode()
+            .setValue(before + to_mmss(clock() - split_fl) + "</col> Total: <col=ff0000>" + after);
       }
 
       split = split_sub = split_fl = clock();
-    } else if (config.showOlmPhaseTimers()
-        && e.getType() == ChatMessageType.GAMEMESSAGE && mes.equals(
-            "The Great Olm is giving its all. This is its final stand.")) {
-      splitphase();
-      olm_phase = 99;
-    }
+    } else if (config.showOlmPhaseTimers() && e.getType() == ChatMessageType.GAMEMESSAGE
+        && mes.equals("The Great Olm is giving its all. This is its final stand.")) {
+          splitphase();
+          olm_phase = 99;
+        }
   }
 
   private void splitphase() {
@@ -163,14 +158,12 @@ public class CoxTimersPlugin extends Plugin {
       break;
     case 29767:
       // Muttadile tendrils spawned (only use for regs)
-      if (client.getVarbitValue(6385) == 0)
-        split_sub = clock();
+      if (client.getVarbitValue(6385) == 0) split_sub = clock();
       break;
     case 30013:
       // Muttadile tree placeholder spawned after tree cut
       if (config.showMuttadileTreeCutTime() && !treecut) {
-        StringBuilder mes = new StringBuilder(
-            "Muttadile tree cut duration: <col=ff0000>");
+        StringBuilder mes = new StringBuilder("Muttadile tree cut duration: <col=ff0000>");
         mes.append(to_mmss(clock() - split_sub));
         mes.append("</col>");
         mes.append(" Total: <col=ff0000>");
@@ -211,8 +204,7 @@ public class CoxTimersPlugin extends Plugin {
 
   @Subscribe
   public void onGameObjectDespawned(GameObjectDespawned e) {
-    if (config.showOlmPhaseTimers()
-        && e.getGameObject().getId() == ObjectID.LARGE_HOLE_29881) {
+    if (config.showOlmPhaseTimers() && e.getGameObject().getId() == ObjectID.LARGE_HOLE_29881) {
       splitphase();
       olm_phase = ~olm_phase;
     }
@@ -222,17 +214,14 @@ public class CoxTimersPlugin extends Plugin {
 
   @Subscribe
   public void onGraphicsObjectCreated(GraphicsObjectCreated e) {
-    if (config.showIcePopTime() && e.getGraphicsObject().getId() == SMOKE_PUFF
-        && !iceout) {
-      WorldPoint wp = WorldPoint.fromLocal(client,
-          e.getGraphicsObject().getLocation());
+    if (config.showIcePopTime() && e.getGraphicsObject().getId() == SMOKE_PUFF && !iceout) {
+      WorldPoint wp = WorldPoint.fromLocal(client, e.getGraphicsObject().getLocation());
       int p = client.getPlane();
       int x = wp.getX() - client.getBaseX();
       int y = wp.getY() - client.getBaseY();
       int template = client.getInstanceTemplateChunks()[p][x / 8][y / 8];
       if (CoxUtil.getroom_type(template) == ICE_DEMON) {
-        StringBuilder mes = new StringBuilder(
-            "Ice Demon pop duration: <col=ff0000>");
+        StringBuilder mes = new StringBuilder("Ice Demon pop duration: <col=ff0000>");
         mes.append(to_mmss(clock() - split));
         mes.append("</col>");
         mes.append(" Total: <col=ff0000>");
@@ -245,8 +234,7 @@ public class CoxTimersPlugin extends Plugin {
   }
 
   private void fc_mes(String mes) {
-    client.addChatMessage(ChatMessageType.FRIENDSCHATNOTIFICATION, "", mes,
-        null);
+    client.addChatMessage(ChatMessageType.FRIENDSCHATNOTIFICATION, "", mes, null);
   }
 
   private int clock() {
@@ -257,8 +245,7 @@ public class CoxTimersPlugin extends Plugin {
     PreciseTimersSetting setting = config.preciseTimers();
     boolean ingame_setting = client.getVarbitValue(11866) == 1;
     if (setting == PreciseTimersSetting.TICK_PRECISION
-        || (setting == PreciseTimersSetting.RESPECT_INGAME_SETTING
-            && ingame_setting))
+        || (setting == PreciseTimersSetting.RESPECT_INGAME_SETTING && ingame_setting))
       return MiscUtil.to_mmss_precise(ticks);
 
     return MiscUtil.to_mmss(ticks);

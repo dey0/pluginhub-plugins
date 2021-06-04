@@ -87,12 +87,11 @@ public class CoxThievingPlugin extends Plugin {
   public void onGameTick(GameTick e) {
     if (client.getVar(Varbits.IN_RAID) == 0) {
       // player has left the raid
-      if (roomtype != -1)
-        try {
-          shutDown();
-        } catch (Exception ex) {
-          ex.printStackTrace();
-        }
+      if (roomtype != -1) try {
+        shutDown();
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      }
       return;
     }
     int plane = client.getPlane();
@@ -108,8 +107,7 @@ public class CoxThievingPlugin extends Plugin {
     WorldPoint wp = client.getLocalPlayer().getWorldLocation();
     int x = wp.getX() - client.getBaseX();
     int y = wp.getY() - client.getBaseY();
-    int type = CoxUtil
-        .getroom_type(client.getInstanceTemplateChunks()[plane][x / 8][y / 8]);
+    int type = CoxUtil.getroom_type(client.getInstanceTemplateChunks()[plane][x / 8][y / 8]);
     if (type != this.roomtype) {
       if (type == THIEVING) {
         // player has entered thieving room
@@ -129,9 +127,8 @@ public class CoxThievingPlugin extends Plugin {
   @Subscribe
   public void onGameObjectSpawned(GameObjectSpawned e) {
     GameObject obj = e.getGameObject();
-    if (obj.getId() != PCHEST && obj.getId() != ECHEST && obj.getId() != GCHEST)
-      return;
-    
+    if (obj.getId() != PCHEST && obj.getId() != ECHEST && obj.getId() != GCHEST) return;
+
     Point p = e.getTile().getSceneLocation();
     int x = p.getX();
     int y = p.getY();
@@ -154,8 +151,7 @@ public class CoxThievingPlugin extends Plugin {
     boolean grub = false;
     if (obj.getId() == ECHEST || obj.getId() == GCHEST) {
       byte notsoln = solve(chestno);
-      if (notsoln != -1)
-        not_solns.add(notsoln);
+      if (notsoln != -1) not_solns.add(notsoln);
       opened = true;
     }
     if (obj.getId() == GCHEST) { // found grubs
@@ -189,8 +185,7 @@ public class CoxThievingPlugin extends Plugin {
       .comparingInt(new ToIntFunction<GrubCollection>() {
         @Override
         public int applyAsInt(GrubCollection v) {
-          if (v == gc_local)
-            return -num_grubs;
+          if (v == gc_local) return -num_grubs;
           return -v.num_with_grubs * config.grubRate() / 100;
         }
       });
@@ -201,8 +196,7 @@ public class CoxThievingPlugin extends Plugin {
       gc = gc_local = new GrubCollection();
       gc.displayname = client.getLocalPlayer().getName();
     }
-    int grubs = client.getItemContainer(InventoryID.INVENTORY)
-        .count(ItemID.CAVERN_GRUBS);
+    int grubs = client.getItemContainer(InventoryID.INVENTORY).count(ItemID.CAVERN_GRUBS);
     num_grubs += grubs - last_grubs;
     last_grubs = grubs;
     gc.num_opened++;
@@ -307,16 +301,14 @@ public class CoxThievingPlugin extends Plugin {
     byte[][] solns = ChestData.CHEST_SOLNS[wind][rot];
     for (byte i = 0; i < solns.length; i++)
       for (byte j = 0; j < solns[i].length; j++)
-        if (solns[i][j] == poisonchestno)
-          return i;
+        if (solns[i][j] == poisonchestno) return i;
     return -1;
   }
 
   private byte coordToChestNo(int x, int y) {
     byte[][] locs = ChestData.CHEST_LOCS[wind];
     for (byte i = 0; i < locs.length; i++)
-      if (locs[i][0] == x && locs[i][1] == y)
-        return (byte) (i + 1);
+      if (locs[i][0] == x && locs[i][1] == y) return (byte) (i + 1);
     return -1;
   }
 

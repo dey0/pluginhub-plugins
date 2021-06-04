@@ -10,8 +10,8 @@ public class CoxPluginsTest {
 
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
-    ExternalPluginManager.loadBuiltin(CoxTimersPlugin.class,
-        CoxVanguardsPlugin.class, CoxThievingPlugin.class);
+    ExternalPluginManager.loadBuiltin(CoxTimersPlugin.class, CoxVanguardsPlugin.class,
+        CoxThievingPlugin.class);
     RuneLite.main(args);
   }
 
