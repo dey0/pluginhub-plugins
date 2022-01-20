@@ -21,4 +21,14 @@ public interface LoadingLinesConfig extends Config {
     return 24;
   }
 
+  @ConfigItem(name = "Show on minimap", description = "", keyName = "minimap")
+  default boolean minimap() {
+    return false;
+  }
+
+  @ConfigItem(name = "Show on world map", description = "", keyName = "worldmap")
+  default boolean worldmap() {
+    return false;
+  }
+
 }

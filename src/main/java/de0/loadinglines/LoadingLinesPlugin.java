@@ -18,6 +18,12 @@ public class LoadingLinesPlugin extends Plugin {
   @Inject
   private LoadingLinesOverlay overlay;
 
+  @Inject
+  private LoadingLinesMinimapOverlay minimapOverlay;
+
+  @Inject
+  private LoadingLinesWorldmapOverlay worldmapOverlay;
+
   @Provides
   LoadingLinesConfig provideConfig(ConfigManager configManager) {
     return configManager.getConfig(LoadingLinesConfig.class);
@@ -26,11 +32,15 @@ public class LoadingLinesPlugin extends Plugin {
   @Override
   protected void startUp() throws Exception {
     overlayManager.add(overlay);
+    overlayManager.add(minimapOverlay);
+    overlayManager.add(worldmapOverlay);
   }
 
   @Override
   protected void shutDown() throws Exception {
     overlayManager.remove(overlay);
+    overlayManager.remove(minimapOverlay);
+    overlayManager.remove(worldmapOverlay);
   }
 
 }
