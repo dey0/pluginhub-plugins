@@ -40,17 +40,14 @@ public class LoadingLinesMinimapOverlay extends Overlay {
 
   @Override
   public Dimension render(Graphics2D g) {
-    if (!config.minimap())
-      return null;
+    if (!config.minimap()) return null;
 
-    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_OFF);
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
     g.setStroke(new BasicStroke(1));
     g.setColor(config.lineColor());
 
     Area minimapClipArea = getMinimapClipArea();
-    if (minimapClipArea == null)
-      return null;
+    if (minimapClipArea == null) return null;
 
     g.setClip(minimapClipArea);
 
@@ -59,9 +56,12 @@ public class LoadingLinesMinimapOverlay extends Overlay {
     final int baseY = client.getBaseY();
 
     WorldPoint southWest = new WorldPoint(baseX + CHUNK_SIZE * 2, baseY + CHUNK_SIZE * 2, z);
-    WorldPoint northWest = new WorldPoint(baseX + CHUNK_SIZE * 2, baseY + SCENE_SIZE - CHUNK_SIZE * 2, z);
-    WorldPoint northEast = new WorldPoint(baseX + SCENE_SIZE - CHUNK_SIZE * 2, baseY + SCENE_SIZE - CHUNK_SIZE * 2, z);
-    WorldPoint southEast = new WorldPoint(baseX + SCENE_SIZE - CHUNK_SIZE * 2, baseY + CHUNK_SIZE * 2, z);
+    WorldPoint northWest = new WorldPoint(baseX + CHUNK_SIZE * 2,
+        baseY + SCENE_SIZE - CHUNK_SIZE * 2, z);
+    WorldPoint northEast = new WorldPoint(baseX + SCENE_SIZE - CHUNK_SIZE * 2,
+        baseY + SCENE_SIZE - CHUNK_SIZE * 2, z);
+    WorldPoint southEast = new WorldPoint(baseX + SCENE_SIZE - CHUNK_SIZE * 2,
+        baseY + CHUNK_SIZE * 2, z);
 
     Point sw = worldToMinimap(southWest);
     Point nw = worldToMinimap(northWest);
@@ -87,23 +87,22 @@ public class LoadingLinesMinimapOverlay extends Overlay {
     return null;
   }
 
-  private Point worldToMinimap(final WorldPoint worldPoint)
-  {
-    if (client.getLocalPlayer() == null)
-      return null;
+  private Point worldToMinimap(final WorldPoint worldPoint) {
+    if (client.getLocalPlayer() == null) return null;
 
     final WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
     final LocalPoint localLocation = client.getLocalPlayer().getLocalLocation();
     final LocalPoint playerLocalPoint = LocalPoint.fromWorld(client, playerLocation);
 
-    if (playerLocalPoint == null)
-      return null;
+    if (playerLocalPoint == null) return null;
 
     final int offsetX = playerLocalPoint.getX() - localLocation.getX();
     final int offsetY = playerLocalPoint.getY() - localLocation.getY();
 
-    final int x = (worldPoint.getX() - playerLocation.getX()) * TILE_SIZE + offsetX / 32 - TILE_SIZE / 2;
-    final int y = (worldPoint.getY() - playerLocation.getY()) * TILE_SIZE + offsetY / 32 - TILE_SIZE / 2 + 1;
+    final int x = (worldPoint.getX() - playerLocation.getX()) * TILE_SIZE + offsetX / 32
+        - TILE_SIZE / 2;
+    final int y = (worldPoint.getY() - playerLocation.getY()) * TILE_SIZE + offsetY / 32
+        - TILE_SIZE / 2 + 1;
 
     final int angle = client.getMapAngle() & 0x7FF;
 
@@ -111,8 +110,7 @@ public class LoadingLinesMinimapOverlay extends Overlay {
     final int cos = (int) (65536.0D * Math.cos((double) angle * Perspective.UNIT));
 
     final Widget minimapDrawWidget = getMinimapDrawWidget();
-    if (minimapDrawWidget == null || minimapDrawWidget.isHidden())
-      return null;
+    if (minimapDrawWidget == null || minimapDrawWidget.isHidden()) return null;
 
     final int xx = y * sin + cos * x >> 16;
     final int yy = sin * x - y * cos >> 16;
@@ -124,28 +122,24 @@ public class LoadingLinesMinimapOverlay extends Overlay {
     return new Point(minimapX, minimapY);
   }
 
-  private Widget getMinimapDrawWidget()
-  {
+  private Widget getMinimapDrawWidget() {
     Widget minimapDrawArea;
     if (client.isResized()) {
       if (client.getVar(Varbits.SIDE_PANELS) == 1)
         minimapDrawArea = client.getWidget(WidgetInfo.RESIZABLE_MINIMAP_DRAW_AREA);
-      else
-        minimapDrawArea = client.getWidget(WidgetInfo.RESIZABLE_MINIMAP_STONES_DRAW_AREA);
-    } else
-      minimapDrawArea = client.getWidget(WidgetInfo.FIXED_VIEWPORT_MINIMAP_DRAW_AREA);
+      else minimapDrawArea = client.getWidget(WidgetInfo.RESIZABLE_MINIMAP_STONES_DRAW_AREA);
+    } else minimapDrawArea = client.getWidget(WidgetInfo.FIXED_VIEWPORT_MINIMAP_DRAW_AREA);
     return minimapDrawArea;
   }
 
-  private Area getMinimapClipArea()
-  {
+  private Area getMinimapClipArea() {
     Widget minimapDrawArea = getMinimapDrawWidget();
 
-    if (minimapDrawArea == null || minimapDrawArea.isHidden())
-      return null;
+    if (minimapDrawArea == null || minimapDrawArea.isHidden()) return null;
 
     Rectangle bounds = minimapDrawArea.getBounds();
-    Ellipse2D ellipse = new Ellipse2D.Double(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
+    Ellipse2D ellipse = new Ellipse2D.Double(bounds.getX(), bounds.getY(), bounds.getWidth(),
+        bounds.getHeight());
 
     return new Area(ellipse);
   }

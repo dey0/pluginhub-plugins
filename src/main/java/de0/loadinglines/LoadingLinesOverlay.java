@@ -38,8 +38,7 @@ public class LoadingLinesOverlay extends Overlay {
 
   @Override
   public Dimension render(Graphics2D g) {
-    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_OFF);
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
     g.setStroke(new BasicStroke(1));
     g.setColor(config.lineColor());
 
@@ -48,7 +47,8 @@ public class LoadingLinesOverlay extends Overlay {
     WorldPoint wp = client.getLocalPlayer().getWorldLocation();
     int curr_x = wp.getX() - client.getBaseX();
     int curr_y = wp.getY() - client.getBaseY();
-    int[][] t = client.getInstanceTemplateChunks()[client.getPlane()];
+    int[][] t = null;
+    if (client.isInInstancedRegion()) t = client.getInstanceTemplateChunks()[client.getPlane()];
 
     final int draw_dist = config.drawDistance();
 
@@ -60,43 +60,35 @@ public class LoadingLinesOverlay extends Overlay {
     for (int y = min_y; y < max_y; y++) {
       int x = 16;
       if (x >= min_x) {
-        if (t[x / 8][y / 8] == -1 || t[(x - 1) / 8][y / 8] == -1)
-          continue;
+        if (t != null && (t[x / 8][y / 8] == -1 || t[(x - 1) / 8][y / 8] == -1)) continue;
         int fl1 = cmap.getFlags()[x][y];
         int fl2 = cmap.getFlags()[x - 1][y];
-        if ((fl1 & MASK_W) == 0 && (fl2 & MASK_E) == 0)
-          line(g, 16, y, 16, y + 1);
+        if ((fl1 & MASK_W) == 0 && (fl2 & MASK_E) == 0) line(g, 16, y, 16, y + 1);
       }
 
       x = 88;
       if (x <= max_x) {
-        if (t[(x - 1) / 8][y / 8] == -1 || t[x / 8][y / 8] == -1)
-          continue;
+        if (t != null && (t[(x - 1) / 8][y / 8] == -1 || t[x / 8][y / 8] == -1)) continue;
         int fl1 = cmap.getFlags()[x - 1][y];
         int fl2 = cmap.getFlags()[x][y];
-        if ((fl1 & MASK_E) == 0 && (fl2 & MASK_W) == 0)
-          line(g, 88, y, 88, y + 1);
+        if ((fl1 & MASK_E) == 0 && (fl2 & MASK_W) == 0) line(g, 88, y, 88, y + 1);
       }
     }
     for (int x = min_x; x < max_x; x++) {
       int y = 16;
       if (y >= min_y) {
-        if (t[x / 8][y / 8] == -1 || t[x / 8][(y - 1) / 8] == -1)
-          continue;
+        if (t != null && (t[x / 8][y / 8] == -1 || t[x / 8][(y - 1) / 8] == -1)) continue;
         int fl1 = cmap.getFlags()[x][y];
         int fl2 = cmap.getFlags()[x][y - 1];
-        if ((fl1 & MASK_S) == 0 && (fl2 & MASK_N) == 0)
-          line(g, x, y, x + 1, y);
+        if ((fl1 & MASK_S) == 0 && (fl2 & MASK_N) == 0) line(g, x, y, x + 1, y);
       }
 
       y = 88;
       if (y <= max_y) {
-        if (t[x / 8][(y - 1) / 8] == -1 || t[x / 8][y / 8] == -1)
-          continue;
+        if (t != null && (t[x / 8][(y - 1) / 8] == -1 || t[x / 8][y / 8] == -1)) continue;
         int fl1 = cmap.getFlags()[x][y - 1];
         int fl2 = cmap.getFlags()[x][y];
-        if ((fl1 & MASK_N) == 0 && (fl2 & MASK_S) == 0)
-          line(g, x, 88, x + 1, 88);
+        if ((fl1 & MASK_N) == 0 && (fl2 & MASK_S) == 0) line(g, x, 88, x + 1, 88);
       }
     }
 
@@ -107,13 +99,10 @@ public class LoadingLinesOverlay extends Overlay {
     int p = client.getPlane();
     int[][][] h = client.getTileHeights();
 
-    Point p0 = Perspective.localToCanvas(client, x0 << 7, y0 << 7,
-        h[p][x0][y0]);
-    Point p1 = Perspective.localToCanvas(client, x1 << 7, y1 << 7,
-        h[p][x1][y1]);
+    Point p0 = Perspective.localToCanvas(client, x0 << 7, y0 << 7, h[p][x0][y0]);
+    Point p1 = Perspective.localToCanvas(client, x1 << 7, y1 << 7, h[p][x1][y1]);
 
-    if (p0 != null && p1 != null)
-      g.drawLine(p0.getX(), p0.getY(), p1.getX(), p1.getY());
+    if (p0 != null && p1 != null) g.drawLine(p0.getX(), p0.getY(), p1.getX(), p1.getY());
   }
 
 }

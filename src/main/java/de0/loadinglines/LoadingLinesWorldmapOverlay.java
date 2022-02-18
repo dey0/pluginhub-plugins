@@ -41,17 +41,14 @@ public class LoadingLinesWorldmapOverlay extends Overlay {
 
   @Override
   public Dimension render(Graphics2D g) {
-    if (!config.worldmap())
-      return null;
+    if (!config.worldmap()) return null;
 
-    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_OFF);
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
     g.setStroke(new BasicStroke(1));
     g.setColor(config.lineColor());
 
     final Area mapClipArea = getWorldMapClipArea();
-    if (mapClipArea == null)
-      return null;
+    if (mapClipArea == null) return null;
 
     g.setClip(mapClipArea);
 
@@ -60,47 +57,42 @@ public class LoadingLinesWorldmapOverlay extends Overlay {
     final int baseY = client.getBaseY();
 
     WorldPoint southWest = new WorldPoint(baseX + CHUNK_SIZE * 2, baseY + CHUNK_SIZE * 2, z);
-    WorldPoint northWest = new WorldPoint(baseX + CHUNK_SIZE * 2, baseY + SCENE_SIZE - CHUNK_SIZE * 2, z);
-    WorldPoint northEast = new WorldPoint(baseX + SCENE_SIZE - CHUNK_SIZE * 2, baseY + SCENE_SIZE - CHUNK_SIZE * 2, z);
-    WorldPoint southEast = new WorldPoint(baseX + SCENE_SIZE - CHUNK_SIZE * 2, baseY + CHUNK_SIZE * 2, z);
+    WorldPoint northWest = new WorldPoint(baseX + CHUNK_SIZE * 2,
+        baseY + SCENE_SIZE - CHUNK_SIZE * 2, z);
+    WorldPoint northEast = new WorldPoint(baseX + SCENE_SIZE - CHUNK_SIZE * 2,
+        baseY + SCENE_SIZE - CHUNK_SIZE * 2, z);
+    WorldPoint southEast = new WorldPoint(baseX + SCENE_SIZE - CHUNK_SIZE * 2,
+        baseY + CHUNK_SIZE * 2, z);
 
     Point sw = worldMapOverlay.mapWorldPointToGraphicsPoint(southWest);
     Point nw = worldMapOverlay.mapWorldPointToGraphicsPoint(northWest);
     Point ne = worldMapOverlay.mapWorldPointToGraphicsPoint(northEast);
     Point se = worldMapOverlay.mapWorldPointToGraphicsPoint(southEast);
 
-    if (sw != null && nw != null)
-      g.drawLine(sw.getX(), sw.getY(), nw.getX(), nw.getY());
+    if (sw != null && nw != null) g.drawLine(sw.getX(), sw.getY(), nw.getX(), nw.getY());
 
-    if (nw != null && ne != null)
-      g.drawLine(nw.getX(), nw.getY(), ne.getX(), ne.getY());
+    if (nw != null && ne != null) g.drawLine(nw.getX(), nw.getY(), ne.getX(), ne.getY());
 
-    if (ne != null && se != null)
-      g.drawLine(ne.getX(), ne.getY(), se.getX(), se.getY());
+    if (ne != null && se != null) g.drawLine(ne.getX(), ne.getY(), se.getX(), se.getY());
 
-    if (se != null && sw != null)
-      g.drawLine(se.getX(), se.getY(), sw.getX(), sw.getY());
+    if (se != null && sw != null) g.drawLine(se.getX(), se.getY(), sw.getX(), sw.getY());
 
     return null;
   }
 
-  private Area getWorldMapClipArea()
-  {
+  private Area getWorldMapClipArea() {
     final Widget overview = client.getWidget(WidgetInfo.WORLD_MAP_OVERVIEW_MAP);
     final Widget surfaceSelector = client.getWidget(WidgetInfo.WORLD_MAP_SURFACE_SELECTOR);
 
     final Widget worldMapView = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
-    if (worldMapView == null)
-      return null;
+    if (worldMapView == null) return null;
 
     final Rectangle bounds = worldMapView.getBounds();
-    if (bounds == null)
-      return null;
+    if (bounds == null) return null;
 
     Area clipArea = new Area(bounds);
 
-    if (overview != null && !overview.isHidden())
-      clipArea.subtract(new Area(overview.getBounds()));
+    if (overview != null && !overview.isHidden()) clipArea.subtract(new Area(overview.getBounds()));
     if (surfaceSelector != null && !surfaceSelector.isHidden())
       clipArea.subtract(new Area(surfaceSelector.getBounds()));
 
