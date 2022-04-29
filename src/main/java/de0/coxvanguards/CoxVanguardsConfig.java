@@ -44,4 +44,7 @@ public interface CoxVanguardsConfig extends Config {
     return Color.CYAN;
   }
 
+  @ConfigItem(position = 7, keyName = "numberLocation", name = "Number location", description = "Location to render each Vanguard's number")
+  default NumberLocationSetting getNumberLocation() { return NumberLocationSetting.DEFAULT_CENTER; }
+
 }
