@@ -20,7 +20,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 
-@PluginDescriptor(name = "[D] Nightmare", description = "Nightmare time tracking")
+@PluginDescriptor(name = "Nightmare Timers", description = "Nightmare time tracking")
 public class NightmarePlugin extends Plugin {
 
   @Inject
