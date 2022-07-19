@@ -81,7 +81,6 @@ public class NightmarePlugin extends Plugin {
     NPC npc = e.getNpc();
     if (get_noa_npc_type(npc) == -1) return;
     nm = npc;
-    System.out.println("Found NOA: " + nm.getIndex());
     fight_timer = phase_timer = subph_timer = client.getTickCount();
     Arrays.fill(phase_splits, -1);
     dirty = true;
@@ -90,7 +89,6 @@ public class NightmarePlugin extends Plugin {
 
   @Subscribe
   public void onNpcChanged(NpcChanged e) {
-    System.out.println("[" + client.getTickCount() + "] npc changed: " + e.getNpc().getName());
     if (e.getNpc() != nm) return;
 
     onNightmareChanged(e.getOld().getId());
