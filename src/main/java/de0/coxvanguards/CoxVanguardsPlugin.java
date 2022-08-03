@@ -4,7 +4,7 @@ import com.google.inject.Provides;
 
 import javax.inject.Inject;
 import net.runelite.api.Client;
-import net.runelite.api.Hitsplat.HitsplatType;
+import net.runelite.api.HitsplatID;
 import net.runelite.api.NPC;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.GameTick;
@@ -136,13 +136,13 @@ public class CoxVanguardsPlugin extends Plugin {
     if (npc == null || npc.getId() < 7526 || npc.getId() > 7529)
       return;
 
-    HitsplatType hs = e.getHitsplat().getHitsplatType();
-    if (hs == HitsplatType.HEAL) {
+    int hs = e.getHitsplat().getHitsplatType();
+    if (hs == HitsplatID.HEAL) {
       this.melhp_fine = solo_base_hp;
       this.rnghp_fine = solo_base_hp;
       this.maghp_fine = solo_base_hp;
-    } else if (hs == HitsplatType.DAMAGE_ME
-        || hs == HitsplatType.DAMAGE_OTHER) {
+    } else if (hs == HitsplatID.DAMAGE_ME || hs == HitsplatID.DAMAGE_OTHER
+        || hs == HitsplatID.DAMAGE_MAX_ME) {
       int amt = e.getHitsplat().getAmount();
       if (npc == melee) {
         this.melhp_fine -= amt;
