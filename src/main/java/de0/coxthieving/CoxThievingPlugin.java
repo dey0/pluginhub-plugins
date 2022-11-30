@@ -164,7 +164,7 @@ public class CoxThievingPlugin extends Plugin {
       soln = solve(chestno);
     }
     if (opened) {
-      int angle = obj.getOrientation().getAngle() >> 9;
+      int angle = obj.getOrientation() >> 9;
       int px = x + (angle == 1 ? -1 : angle == 3 ? 1 : 0);
       int py = y + (angle == 0 ? -1 : angle == 2 ? 1 : 0);
       for (Player pl : client.getPlayers()) {
