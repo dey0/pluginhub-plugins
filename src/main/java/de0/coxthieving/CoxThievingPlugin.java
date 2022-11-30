@@ -85,7 +85,7 @@ public class CoxThievingPlugin extends Plugin {
 
   @Subscribe
   public void onGameTick(GameTick e) {
-    if (client.getVar(Varbits.IN_RAID) == 0) {
+    if (client.getVarbitValue(Varbits.IN_RAID) == 0) {
       // player has left the raid
       if (roomtype != -1)
         try {
