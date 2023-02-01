@@ -74,7 +74,7 @@ public class CoxVanguardsHighlight extends Overlay {
 
       if (!goodToClear) {
         String str = goodToKill ? "*" + dist : Integer.toString(dist);
-        npctext(g, van, str, c);
+        npctext(g, van, str, c, config);
       }
     } else if (config.showHps()) {
       int hp = van.getHealthRatio();
@@ -82,17 +82,38 @@ public class CoxVanguardsHighlight extends Overlay {
         hp = last_hp;
       int hpPercent = hp * 100 / 30;
       String str = Integer.toString(hpPercent);
-      npctext(g, van, str, c);
+      npctext(g, van, str, c, config);
     }
   }
 
-  private void npctext(Graphics2D g, NPC npc, String str, Color c) {
-    Point point = npc.getCanvasTextLocation(g, str, npc.getLogicalHeight());
+  private void npctext(Graphics2D g, NPC npc, String str, Color c, CoxVanguardsConfig config) {
+    Point point = getVanguardTextLocation(g, npc, str, config);
     if (point == null)
       return;
-    point = new Point(point.getX(), point.getY() + 20);
     g.setFont(FontManager.getRunescapeBoldFont());
     OverlayUtil.renderTextLocation(g, point, str, c);
+  }
+
+  private Point getVanguardTextLocation(Graphics2D g, NPC npc, String str, CoxVanguardsConfig config) {
+    int zOffset, yOffset;
+    switch (config.getNumberLocation()) {
+      case BELOW_VANGUARD:
+        zOffset = 0;
+        yOffset = 24;
+        break;
+      case ABOVE_VANGUARD:
+        zOffset = npc.getLogicalHeight();
+        yOffset = -20;
+        break;
+      case DEFAULT_CENTER:
+      default:
+        zOffset = npc.getLogicalHeight();
+        yOffset = 20;
+    }
+    Point point = npc.getCanvasTextLocation(g, str, zOffset);
+    if (point == null)
+      return null;
+    return new Point(point.getX(), point.getY() + yOffset);
   }
 
 }
