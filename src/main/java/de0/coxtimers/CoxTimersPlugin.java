@@ -1,11 +1,6 @@
 package de0.coxtimers;
 
-import static de0.util.CoxUtil.*;
-
-import javax.inject.Inject;
-
 import com.google.inject.Provides;
-
 import de0.util.CoxUtil;
 import de0.util.MiscUtil;
 import net.runelite.api.ChatMessageType;
@@ -24,6 +19,13 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+
+import javax.inject.Inject;
+
+import static de0.util.CoxUtil.ICE_DEMON;
+import static de0.util.CoxUtil.getroom_name;
+import static de0.util.CoxUtil.getroom_sort;
+import static de0.util.CoxUtil.getroom_type;
 
 @PluginDescriptor(name = "CoX Timers", description = "Time tracking for CoX rooms")
 public class CoxTimersPlugin extends Plugin {
@@ -102,7 +104,7 @@ public class CoxTimersPlugin extends Plugin {
   public void onChatMessage(ChatMessage e) {
     String mes = e.getMessage();
     if (e.getType() == ChatMessageType.FRIENDSCHATNOTIFICATION
-        && mes.startsWith("<col=ef20ff>")) {
+        && mes.startsWith("<col=ff289d>")) {
       int duration = mes.indexOf(FL_COMPLETE_MES);
       boolean is_fl_time = duration != -1;
       boolean is_olm_time = mes.contains("<br>");
