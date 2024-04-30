@@ -7,5 +7,3 @@ build
 nbactions.xml
 nb-configuration.xml
 nbproject/
-/bin/
-/client-1.6.36.2-shaded.jar
