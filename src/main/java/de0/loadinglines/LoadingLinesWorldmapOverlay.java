@@ -1,30 +1,30 @@
 package de0.loadinglines;
 
 import com.google.inject.Inject;
+import net.runelite.api.Client;
+import net.runelite.api.Constants;
+import net.runelite.api.Point;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.widgets.Widget;
+import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayLayer;
+import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
+
 import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Area;
-import net.runelite.api.Client;
-import net.runelite.api.Constants;
-import net.runelite.api.Point;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.ui.overlay.Overlay;
-import net.runelite.client.ui.overlay.OverlayLayer;
-import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayPriority;
-import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 
 public class LoadingLinesWorldmapOverlay extends Overlay {
   private static final int CHUNK_SIZE = Constants.CHUNK_SIZE;
   private static final int SCENE_SIZE = Constants.SCENE_SIZE;
 
-  private Client client;
-  private LoadingLinesConfig config;
+  private final Client client;
+  private final LoadingLinesConfig config;
 
   @Inject
   private WorldMapOverlay worldMapOverlay;
@@ -34,9 +34,9 @@ public class LoadingLinesWorldmapOverlay extends Overlay {
     this.client = client;
     this.config = config;
     setPosition(OverlayPosition.DYNAMIC);
-    setPriority(OverlayPriority.LOW);
+    setPriority(PRIORITY_LOW);
     setLayer(OverlayLayer.MANUAL);
-    drawAfterLayer(WidgetInfo.WORLD_MAP_VIEW);
+    drawAfterLayer(ComponentID.WORLD_MAP_MAPVIEW);
   }
 
   @Override
@@ -81,10 +81,10 @@ public class LoadingLinesWorldmapOverlay extends Overlay {
   }
 
   private Area getWorldMapClipArea() {
-    final Widget overview = client.getWidget(WidgetInfo.WORLD_MAP_OVERVIEW_MAP);
-    final Widget surfaceSelector = client.getWidget(WidgetInfo.WORLD_MAP_SURFACE_SELECTOR);
+    final Widget overview = client.getWidget(ComponentID.WORLD_MAP_OVERVIEW_MAP);
+    final Widget surfaceSelector = client.getWidget(ComponentID.WORLD_MAP_SURFACE_SELECTOR);
 
-    final Widget worldMapView = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
+    final Widget worldMapView = client.getWidget(ComponentID.WORLD_MAP_MAPVIEW);
     if (worldMapView == null) return null;
 
     final Rectangle bounds = worldMapView.getBounds();

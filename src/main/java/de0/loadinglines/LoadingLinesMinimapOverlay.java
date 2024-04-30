@@ -1,13 +1,6 @@
 package de0.loadinglines;
 
 import com.google.inject.Inject;
-import java.awt.BasicStroke;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
 import net.runelite.api.Client;
 import net.runelite.api.Constants;
 import net.runelite.api.Perspective;
@@ -15,11 +8,19 @@ import net.runelite.api.Point;
 import net.runelite.api.Varbits;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
+
+import java.awt.BasicStroke;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
 
 public class LoadingLinesMinimapOverlay extends Overlay {
 
@@ -27,8 +28,8 @@ public class LoadingLinesMinimapOverlay extends Overlay {
   private static final int SCENE_SIZE = Constants.SCENE_SIZE;
   private static final int TILE_SIZE = 4;
 
-  private Client client;
-  private LoadingLinesConfig config;
+  private final Client client;
+  private final LoadingLinesConfig config;
 
   @Inject
   LoadingLinesMinimapOverlay(Client client, LoadingLinesConfig config) {
@@ -104,7 +105,7 @@ public class LoadingLinesMinimapOverlay extends Overlay {
     final int y = (worldPoint.getY() - playerLocation.getY()) * TILE_SIZE + offsetY / 32
         - TILE_SIZE / 2 + 1;
 
-    final int angle = client.getMapAngle() & 0x7FF;
+    final int angle = client.getCameraYawTarget() & 0x7FF;
 
     final int sin = (int) (65536.0D * Math.sin((double) angle * Perspective.UNIT));
     final int cos = (int) (65536.0D * Math.cos((double) angle * Perspective.UNIT));
@@ -125,10 +126,10 @@ public class LoadingLinesMinimapOverlay extends Overlay {
   private Widget getMinimapDrawWidget() {
     Widget minimapDrawArea;
     if (client.isResized()) {
-      if (client.getVar(Varbits.SIDE_PANELS) == 1)
-        minimapDrawArea = client.getWidget(WidgetInfo.RESIZABLE_MINIMAP_DRAW_AREA);
-      else minimapDrawArea = client.getWidget(WidgetInfo.RESIZABLE_MINIMAP_STONES_DRAW_AREA);
-    } else minimapDrawArea = client.getWidget(WidgetInfo.FIXED_VIEWPORT_MINIMAP_DRAW_AREA);
+      if (client.getVarbitValue(Varbits.SIDE_PANELS) == 0)
+        minimapDrawArea = client.getWidget(ComponentID.RESIZABLE_VIEWPORT_MINIMAP_DRAW_AREA);
+      else minimapDrawArea = client.getWidget(ComponentID.RESIZABLE_VIEWPORT_BOTTOM_LINE_MINIMAP_DRAW_AREA);
+    } else minimapDrawArea = client.getWidget(ComponentID.FIXED_VIEWPORT_MINIMAP_DRAW_AREA);
     return minimapDrawArea;
   }
 
