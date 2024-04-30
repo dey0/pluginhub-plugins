@@ -155,7 +155,7 @@ public class CoxVanguardsPlugin extends Plugin {
   }
 
   boolean isSolo() {
-    return client.getVarbitValue(5424) == 1;
+    return client.getVarbitValue(9540) == 1;
   }
 
   int getSoloBaseHp() {
