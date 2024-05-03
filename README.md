@@ -15,6 +15,8 @@ You should then see a new entry under the Settings panel: "Object Hider". You ca
 ## Removing Ground Objects
 By default, no objects will be hidden, and each must be manually added using the selector tool.
 
-The way to select Ground Objects to hide is to hold the key binding (ie: Ctrl+Shift) and right-click on a tile in game. You'll see a magenta border drawn around the currently highlighted tile when in this mode.
+The way to select Ground Objects to hide is to hold the key binding (not bound by default) and right-click on a tile in game. You'll see a magenta border drawn around the currently highlighted tile when in this mode.
+
+NOTE: The list of `IDs to hide` will not be updated immediately. Re-open the plugin's settings to refresh the list.
 
 ![](https://github.com/leo288/object-hider/raw/master/readme2.png)

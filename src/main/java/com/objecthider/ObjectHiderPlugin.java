@@ -1,13 +1,20 @@
 package com.objecthider;
 
 import com.google.inject.Provides;
-import javax.inject.Inject;
-import javax.swing.*;
-
-import net.runelite.api.*;
+import net.runelite.api.ChatMessageType;
+import net.runelite.api.Client;
+import net.runelite.api.GroundObject;
+import net.runelite.api.ObjectComposition;
+import net.runelite.api.Scene;
+import net.runelite.api.Tile;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.*;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.events.GroundObjectDespawned;
+import net.runelite.api.events.GroundObjectSpawned;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.chat.ChatMessageBuilder;
+import net.runelite.client.chat.ChatMessageManager;
+import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
@@ -16,13 +23,20 @@ import net.runelite.client.input.MouseListener;
 import net.runelite.client.input.MouseManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.ClientUI;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.HotkeyListener;
 import net.runelite.client.util.Text;
 
+import javax.inject.Inject;
+import javax.swing.SwingUtilities;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @PluginDescriptor(name = "Ground Object Hider", description = "Hides Ground Objects. A selector is used to choose objects to hide.", tags = {
@@ -30,6 +44,9 @@ import java.util.stream.Collectors;
 public class ObjectHiderPlugin extends Plugin {
   @Inject
   private Client client;
+
+  @Inject
+  private ClientUI clientUI;
 
   @Inject
   private ClientThread clientThread;
@@ -49,19 +66,29 @@ public class ObjectHiderPlugin extends Plugin {
   @Inject
   private MouseManager mouseManager;
 
+  @Inject
+  private ChatMessageManager chatMessageManager;
+
   public boolean selectGroundObjectMode = false;
 
   private HashMap<WorldPoint, GroundObject> hiddenObjects = new HashMap<>();
 
   /**
    * groundObjectsKeyListener is an instance of `HotkeyListener` designed to let
-   * the user pick a tile-ingame to have it's Ground Object hidden.
+   * the user pick a tile in-game to have its Ground Object hidden.
    */
   private final HotkeyListener groundObjectsKeyListener = new HotkeyListener(
       () -> config.hideGroundObjectKey()) {
     @Override
     public void keyPressed(KeyEvent e) {
       if (config.hideGroundObjectKey().matches(e)) {
+        if (!selectGroundObjectMode) {
+          ChatMessageBuilder message = new ChatMessageBuilder().append("Ground Object Hider hotkey triggered.");
+          chatMessageManager.queue(QueuedMessage.builder()
+              .type(ChatMessageType.CONSOLE)
+              .runeLiteFormattedMessage(message.build())
+              .build());
+        }
         selectGroundObjectMode = true;
       }
     }
@@ -69,6 +96,13 @@ public class ObjectHiderPlugin extends Plugin {
     @Override
     public void keyReleased(KeyEvent e) {
       if (config.hideGroundObjectKey().matches(e)) {
+        if (selectGroundObjectMode) {
+          ChatMessageBuilder message = new ChatMessageBuilder().append("Ground Object Hider hotkey released.");
+          chatMessageManager.queue(QueuedMessage.builder()
+              .type(ChatMessageType.CONSOLE)
+              .runeLiteFormattedMessage(message.build())
+              .build());
+        }
         selectGroundObjectMode = false;
       }
     }
@@ -76,7 +110,7 @@ public class ObjectHiderPlugin extends Plugin {
 
   /**
    * mouseListener is an instance of `MouseListener` designed solely to let the
-   * user pick a tile in-game to have it's Ground Object hidden.
+   * user pick a tile in-game to have its Ground Object hidden.
    */
   private final MouseListener mouseListener = new MouseListener() {
     @Override
@@ -349,6 +383,14 @@ public class ObjectHiderPlugin extends Plugin {
       for (WorldPoint wp : toRemove) {
         this.hiddenObjects.remove(wp);
       }
+    }
+    if (selectGroundObjectMode && !clientUI.isFocused()) {
+      ChatMessageBuilder message = new ChatMessageBuilder().append("Ground Object Hider hotkey released.");
+      chatMessageManager.queue(QueuedMessage.builder()
+          .type(ChatMessageType.CONSOLE)
+          .runeLiteFormattedMessage(message.build())
+          .build());
+      selectGroundObjectMode = false;
     }
   }
 
