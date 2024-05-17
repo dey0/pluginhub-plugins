@@ -102,21 +102,24 @@ public class CoxTimersPlugin extends Plugin {
 
   @Subscribe
   public void onChatMessage(ChatMessage e) {
+    if (!in_raid)
+      return;
+
     String mes = e.getMessage();
     if (e.getType() == ChatMessageType.FRIENDSCHATNOTIFICATION
-        && mes.startsWith("<col=ff289d>")) {
+        && mes.startsWith("<col=ef20ff>Congratulations")) {
+      e.getMessageNode().setValue(mes + " Olm duration: <col=ff0000>" + to_mmss(clock() - split_fl) + "</col>");
+    }
+    else if (e.getType() == ChatMessageType.FRIENDSCHATNOTIFICATION
+             && mes.startsWith("<col=ff289d>")) {
       int duration = mes.indexOf(FL_COMPLETE_MES);
       boolean is_fl_time = duration != -1;
-      boolean is_olm_time = mes.contains("<br>");
       boolean is_top_floor = mes.contains("Upper");
 
-      if (!is_fl_time && !is_olm_time)
+      if (!is_fl_time)
         return;
 
-      if (is_olm_time) {
-        e.getMessageNode().setValue(mes + " Olm duration: <col=ff0000>"
-            + to_mmss(clock() - split_fl) + "</col>");
-      } else if (!is_top_floor) {
+      if (!is_top_floor) {
         String before = mes.substring(0, duration + FL_COMPLETE_MES.length());
         String after = mes.substring(duration + FL_COMPLETE_MES.length());
         e.getMessageNode().setValue(before + to_mmss(clock() - split_fl)
