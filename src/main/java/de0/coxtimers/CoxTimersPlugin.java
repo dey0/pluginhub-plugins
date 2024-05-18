@@ -1,11 +1,6 @@
 package de0.coxtimers;
 
-import static de0.util.CoxUtil.*;
-
-import javax.inject.Inject;
-
 import com.google.inject.Provides;
-
 import de0.util.CoxUtil;
 import de0.util.MiscUtil;
 import net.runelite.api.ChatMessageType;
@@ -24,6 +19,13 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+
+import javax.inject.Inject;
+
+import static de0.util.CoxUtil.ICE_DEMON;
+import static de0.util.CoxUtil.getroom_name;
+import static de0.util.CoxUtil.getroom_sort;
+import static de0.util.CoxUtil.getroom_type;
 
 @PluginDescriptor(name = "CoX Timers", description = "Time tracking for CoX rooms")
 public class CoxTimersPlugin extends Plugin {
@@ -100,21 +102,18 @@ public class CoxTimersPlugin extends Plugin {
 
   @Subscribe
   public void onChatMessage(ChatMessage e) {
+    if (!in_raid)
+      return;
+
     String mes = e.getMessage();
     if (e.getType() == ChatMessageType.FRIENDSCHATNOTIFICATION
-        && mes.startsWith("<col=ef20ff>")) {
+        && mes.contains("Congratulations - your raid is complete!")) {
+      e.getMessageNode().setValue(mes + " Olm duration: <col=ff0000>" + to_mmss(clock() - split_fl) + "</col>");
+    } else if (e.getType() == ChatMessageType.FRIENDSCHATNOTIFICATION
+             && mes.contains(FL_COMPLETE_MES)) {
       int duration = mes.indexOf(FL_COMPLETE_MES);
-      boolean is_fl_time = duration != -1;
-      boolean is_olm_time = mes.contains("<br>");
-      boolean is_top_floor = mes.contains("Upper");
 
-      if (!is_fl_time && !is_olm_time)
-        return;
-
-      if (is_olm_time) {
-        e.getMessageNode().setValue(mes + " Olm duration: <col=ff0000>"
-            + to_mmss(clock() - split_fl) + "</col>");
-      } else if (!is_top_floor) {
+      if (!mes.contains("Upper")) {
         String before = mes.substring(0, duration + FL_COMPLETE_MES.length());
         String after = mes.substring(duration + FL_COMPLETE_MES.length());
         e.getMessageNode().setValue(before + to_mmss(clock() - split_fl)

@@ -23,7 +23,9 @@
 ![Example image](https://i.imgur.com/sLfV7bA.png)
 
 ## Changelog
-#### 1/19/21
-Initial release
+#### 30/04/2024
+- Fixed Vanguards HP in scaled solo raids.
+- Fixed floor end timer bug.
 
-##
+#### 19/01/2021
+- Initial release
