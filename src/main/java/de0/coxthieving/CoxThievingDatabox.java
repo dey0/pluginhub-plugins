@@ -30,7 +30,7 @@ public class CoxThievingDatabox extends OverlayPanel {
   @Override
   public Dimension render(Graphics2D graphics) {
     int myindex;
-    if (plugin.gc_local == null || plugin.gc_local.num_opened == 0) {
+    if (plugin.gc_local == null || plugin.gc_local.num_with_grubs == 0) {
       myindex = -1;
     } else {
       myindex = Arrays.binarySearch(plugin.gc_others, 0, plugin.gc_others_count,
@@ -60,7 +60,7 @@ public class CoxThievingDatabox extends OverlayPanel {
   private void add_gc_line(List<LayoutableRenderableEntity> elems,
       GrubCollection gc) {
     elems.add(LineComponent.builder().left(gc.displayname)
-        .right(gc.num_with_grubs + "/" + gc.num_opened).build());
+                           .right(String.valueOf(gc.num_with_grubs)).build());
   }
 
 }
