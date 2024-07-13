@@ -2,14 +2,23 @@ package de0.coxtimers;
 
 import com.google.inject.Provides;
 import de0.util.CoxUtil;
+import static de0.util.CoxUtil.ICE_DEMON;
+import static de0.util.CoxUtil.getroom_name;
+import static de0.util.CoxUtil.getroom_sort;
+import static de0.util.CoxUtil.getroom_type;
 import de0.util.MiscUtil;
+import javax.inject.Inject;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.GameState;
+import net.runelite.api.NPC;
+import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Point;
+import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ActorDeath;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.GameObjectDespawned;
@@ -19,13 +28,6 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-
-import javax.inject.Inject;
-
-import static de0.util.CoxUtil.ICE_DEMON;
-import static de0.util.CoxUtil.getroom_name;
-import static de0.util.CoxUtil.getroom_sort;
-import static de0.util.CoxUtil.getroom_type;
 
 @PluginDescriptor(name = "CoX Timers", description = "Time tracking for CoX rooms")
 public class CoxTimersPlugin extends Plugin {
@@ -42,6 +44,7 @@ public class CoxTimersPlugin extends Plugin {
   private int cryp[] = new int[16], cryx[] = new int[16], cryy[] = new int[16];
 
   // Olm state
+  private int mage_hand_start_time;
   private int olm_phase;
 
   // Misc state
@@ -61,6 +64,7 @@ public class CoxTimersPlugin extends Plugin {
       in_raid = false;
       return;
     }
+    WorldView wv = client.getTopLevelWorldView();
     if (!in_raid) {
       in_raid = true;
       split = 0;
@@ -74,13 +78,13 @@ public class CoxTimersPlugin extends Plugin {
       if (this.cryp[i] == -1)
         continue;
       int p = cryp[i];
-      int x = cryx[i] - client.getBaseX();
-      int y = cryy[i] - client.getBaseY();
-      if (p != client.getPlane() || x < 0 || x >= 104 || y < 0 || y >= 104) {
+      int x = cryx[i] - wv.getBaseX();
+      int y = cryy[i] - wv.getBaseY();
+      if (p != wv.getPlane() || x < 0 || x >= 104 || y < 0 || y >= 104) {
         this.cryp[i] = -1;
         continue;
       }
-      int flags = client.getCollisionMaps()[p].getFlags()[x][y];
+      int flags = wv.getCollisionMaps()[p].getFlags()[x][y];
       if ((flags & 0x100) == 0) {
         StringBuilder mes = new StringBuilder();
         mes.append(getroom_sort(i) == 'C' ? "Combat room `" : "Puzzle `");
@@ -130,8 +134,15 @@ public class CoxTimersPlugin extends Plugin {
   }
 
   private void splitphase() {
+    splitphase(false);
+  }
+
+  private void splitphase(boolean mage_hand_death) {
     StringBuilder mes = new StringBuilder();
-    if (olm_phase == 99) {
+    if (mage_hand_death) {
+      mes.append("Olm mage hand phase ");
+      mes.append(olm_phase);
+    } else if (olm_phase == get_olm_phases()) {
       mes.append("Olm head");
     } else {
       mes.append("Olm phase ");
@@ -150,9 +161,35 @@ public class CoxTimersPlugin extends Plugin {
     split = clock();
   }
 
+  // Total phases including head.
+  private int get_olm_phases()
+  {
+    int scale = client.getVarbitValue(9540);
+    return Math.min(4 + (scale / 8), 10);
+  }
+
+  @Subscribe
+  public void onActorDeath(ActorDeath event)
+  {
+    if (!(event.getActor() instanceof NPC)) {
+      return;
+    }
+    NPC npc = (NPC) event.getActor();
+    if (npc.getId() != NpcID.GREAT_OLM_RIGHT_CLAW && npc.getId() != NpcID.GREAT_OLM_RIGHT_CLAW_7553) {
+      return;
+    }
+
+    if (config.showMageHandDuration() && mage_hand_start_time != -1)
+    {
+      splitphase(true);
+      mage_hand_start_time = -1;
+    }
+  }
+
   @Subscribe
   public void onGameObjectSpawned(GameObjectSpawned e) {
     GameObject go = e.getGameObject();
+    WorldView wv = client.getTopLevelWorldView();
     switch (go.getId()) {
     case 29881: // Olm spawned
       if (olm_phase < 0) {
@@ -196,13 +233,13 @@ public class CoxTimersPlugin extends Plugin {
       int p = go.getPlane();
       int x = pt.getX();
       int y = pt.getY();
-      int template = client.getInstanceTemplateChunks()[p][x / 8][y / 8];
+      int template = wv.getInstanceTemplateChunks()[p][x / 8][y / 8];
       int roomtype = getroom_type(template);
       if (roomtype < 16) {
         // add obstacle to list
         cryp[roomtype] = p;
-        cryx[roomtype] = x + client.getBaseX();
-        cryy[roomtype] = y + client.getBaseY();
+        cryx[roomtype] = x + wv.getBaseX();
+        cryy[roomtype] = y + wv.getBaseY();
       }
       break;
     }
@@ -225,10 +262,11 @@ public class CoxTimersPlugin extends Plugin {
         && !iceout) {
       WorldPoint wp = WorldPoint.fromLocal(client,
           e.getGraphicsObject().getLocation());
-      int p = client.getPlane();
-      int x = wp.getX() - client.getBaseX();
-      int y = wp.getY() - client.getBaseY();
-      int template = client.getInstanceTemplateChunks()[p][x / 8][y / 8];
+      WorldView wv = client.getTopLevelWorldView();
+      int p = wv.getPlane();
+      int x = wp.getX() - wv.getBaseX();
+      int y = wp.getY() - wv.getBaseY();
+      int template = wv.getInstanceTemplateChunks()[p][x / 8][y / 8];
       if (CoxUtil.getroom_type(template) == ICE_DEMON) {
         StringBuilder mes = new StringBuilder(
             "Ice Demon pop duration: <col=ff0000>");

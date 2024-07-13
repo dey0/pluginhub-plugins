@@ -22,7 +22,12 @@ public interface CoxTimersConfig extends Config {
     return true;
   }
 
-  @ConfigItem(position = 3, keyName = "showMuttadileTreeCutTime", name = "Time Muttadile tree cut", description = "Partial room timer for Muttadiles")
+  @ConfigItem(position = 3, keyName = "showMageHandDuration", name = "Time Mage Hand", description = "Mage hand timers for Olm")
+  default boolean showMageHandDuration() {
+    return true;
+  }
+
+  @ConfigItem(position = 4, keyName = "showMuttadileTreeCutTime", name = "Time Muttadile tree cut", description = "Partial room timer for Muttadiles")
   default boolean showMuttadileTreeCutTime() {
     return true;
   }
