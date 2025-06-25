@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import de0.util.MiscUtil;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
-import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.NpcChanged;
@@ -32,30 +31,30 @@ public class NightmarePlugin extends Plugin {
   private static final int NM_ROOM_MASK = 0b11_1111111000_11111111000_000;
   private static final int NM_ROOM = 3 << 24 | 120 << 16 | 310 << 5;
 
-  private static final int NIGHTMARE_P1 = NpcID.THE_NIGHTMARE_9425;
-  private static final int NIGHTMARE_P2 = NpcID.THE_NIGHTMARE_9426;
-  private static final int NIGHTMARE_P3 = NpcID.THE_NIGHTMARE_9427;
+  private static final int NIGHTMARE_P1 = 9425;
+  private static final int NIGHTMARE_P2 = 9426;
+  private static final int NIGHTMARE_P3 = 9427;
 
-  private static final int NIGHTMARE_P1_PILLARS = NpcID.THE_NIGHTMARE_9428;
-  private static final int NIGHTMARE_P2_PILLARS = NpcID.THE_NIGHTMARE_9429;
-  private static final int NIGHTMARE_P3_PILLARS = NpcID.THE_NIGHTMARE_9430;
-  private static final int NIGHTMARE_SLEEPWALKERS = NpcID.THE_NIGHTMARE_9431;
-  private static final int NIGHTMARE_DOWN = NpcID.THE_NIGHTMARE_9432;
-  private static final int NIGHTMARE_DEATH = NpcID.THE_NIGHTMARE_9433;
+  private static final int NIGHTMARE_P1_PILLARS = 9428;
+  private static final int NIGHTMARE_P2_PILLARS = 9429;
+  private static final int NIGHTMARE_P3_PILLARS = 9430;
+  private static final int NIGHTMARE_SLEEPWALKERS = 9431;
+  private static final int NIGHTMARE_DOWN = 9432;
+  private static final int NIGHTMARE_DEATH = 9433;
 
-  private static final int PHOSANI_P1 = NpcID.PHOSANIS_NIGHTMARE_9416;
-  private static final int PHOSANI_P2 = NpcID.PHOSANIS_NIGHTMARE_9417;
-  private static final int PHOSANI_P3 = NpcID.PHOSANIS_NIGHTMARE_9418;
-  private static final int PHOSANI_P4 = NpcID.PHOSANIS_NIGHTMARE_11153;
-  private static final int PHOSANI_P5 = NpcID.PHOSANIS_NIGHTMARE_11154;
+  private static final int PHOSANI_VARIANT_1 = 9416;
+  private static final int PHOSANI_VARIANT_2 = 9417;
+  private static final int PHOSANI_VARIANT_3 = 9418;
+  private static final int PHOSANI_VARIANT_4 = 11153;
+  private static final int PHOSANI_P4 = 11154;
 
-  private static final int PHOSANI_P1_PILLARS = NpcID.PHOSANIS_NIGHTMARE_9419;
-  private static final int PHOSANI_P2_PILLARS = NpcID.PHOSANIS_NIGHTMARE_9420;
-  private static final int PHOSANI_P3_PILLARS = NpcID.PHOSANIS_NIGHTMARE_9421;
-  private static final int PHOSANI_P4_PILLARS = NpcID.PHOSANIS_NIGHTMARE_11155;
-  private static final int PHOSANI_SLEEPWALKERS = NpcID.PHOSANIS_NIGHTMARE_9422;
-  private static final int PHOSANI_DOWN = NpcID.PHOSANIS_NIGHTMARE_9423;
-  private static final int PHOSANI_DEATH = NpcID.PHOSANIS_NIGHTMARE_9424;
+  private static final int PHOSANI_PILLARS_VARIANT_1 = 9419;
+  private static final int PHOSANI_PILLARS_VARIANT_2 = 9420;
+  private static final int PHOSANI_PILLARS_VARIANT_3 = 9421;
+  private static final int PHOSANI_PILLARS_VARIANT_4 = 11155;
+  private static final int PHOSANI_SLEEPWALKERS = 9422;
+  private static final int PHOSANI_DOWN = 9423;
+  private static final int PHOSANI_DEATH = 9424;
 
   private NPC nm;
   private int phase;
@@ -120,11 +119,11 @@ public class NightmarePlugin extends Plugin {
     case NIGHTMARE_P1:
     case NIGHTMARE_P2:
     case NIGHTMARE_P3:
-    case PHOSANI_P1:
-    case PHOSANI_P2:
-    case PHOSANI_P3:
+    case PHOSANI_VARIANT_1:
+    case PHOSANI_VARIANT_2:
+    case PHOSANI_VARIANT_3:
+    case PHOSANI_VARIANT_4:
     case PHOSANI_P4:
-    case PHOSANI_P5:
       if (oldid == NIGHTMARE_DOWN || oldid == PHOSANI_DOWN) {
         if (nib == null) {
           nib = new NightmareInfoBox(client, this);
@@ -148,10 +147,10 @@ public class NightmarePlugin extends Plugin {
     case NIGHTMARE_P1_PILLARS:
     case NIGHTMARE_P2_PILLARS:
     case NIGHTMARE_P3_PILLARS:
-    case PHOSANI_P1_PILLARS:
-    case PHOSANI_P2_PILLARS:
-    case PHOSANI_P3_PILLARS:
-    case PHOSANI_P4_PILLARS:
+    case PHOSANI_PILLARS_VARIANT_1:
+    case PHOSANI_PILLARS_VARIANT_2:
+    case PHOSANI_PILLARS_VARIANT_3:
+    case PHOSANI_PILLARS_VARIANT_4:
       mes(tick_count, "boss");
       subph_timer = tick_count;
       break;
@@ -190,15 +189,15 @@ public class NightmarePlugin extends Plugin {
     case NIGHTMARE_DOWN:
     case NIGHTMARE_DEATH:
       return 0;
-    case PHOSANI_P1:
-    case PHOSANI_P2:
-    case PHOSANI_P3:
+    case PHOSANI_VARIANT_1:
+    case PHOSANI_VARIANT_2:
+    case PHOSANI_VARIANT_3:
+    case PHOSANI_VARIANT_4:
     case PHOSANI_P4:
-    case PHOSANI_P5:
-    case PHOSANI_P1_PILLARS:
-    case PHOSANI_P2_PILLARS:
-    case PHOSANI_P3_PILLARS:
-    case PHOSANI_P4_PILLARS:
+    case PHOSANI_PILLARS_VARIANT_1:
+    case PHOSANI_PILLARS_VARIANT_2:
+    case PHOSANI_PILLARS_VARIANT_3:
+    case PHOSANI_PILLARS_VARIANT_4:
     case PHOSANI_DOWN:
     case PHOSANI_SLEEPWALKERS:
     case PHOSANI_DEATH:
