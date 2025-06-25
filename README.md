@@ -4,6 +4,10 @@
 - Convenient infobox for quick display of total time
 
 ## Changelog
+
+#### 25/06/2025
+Update plugin for Phosani's phase being removed
+
 #### 6/20/2022
 Initial release
 
