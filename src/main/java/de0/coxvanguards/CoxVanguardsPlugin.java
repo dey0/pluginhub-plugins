@@ -12,6 +12,8 @@ import net.runelite.api.events.HitsplatApplied;
 import net.runelite.api.events.NpcChanged;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
+import net.runelite.api.gameval.NpcID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -85,9 +87,9 @@ public class CoxVanguardsPlugin extends Plugin {
   @Subscribe
   public void onNpcSpawned(NpcSpawned e) {
     NPC npc = e.getNpc();
-    if (melee == null && npc.getId() == 7527)
+    if (melee == null && npc.getId() == NpcID.RAIDS_VANGUARD_MELEE)
       melee = npc;
-    else if (range == null && npc.getId() == 7528)
+    else if (range == null && npc.getId() == NpcID.RAIDS_VANGUARD_RANGED)
       range = npc;
     else if (mage == null && npc.getId() == 7529)
       mage = npc;
@@ -96,13 +98,15 @@ public class CoxVanguardsPlugin extends Plugin {
   @Subscribe
   public void onNpcChanged(NpcChanged e) {
     NPC npc = e.getNpc();
-    if (npc.getId() == 7527 && melee == null)
+    if (npc.getId() == NpcID.RAIDS_VANGUARD_MELEE && melee == null) {
       melee = npc;
     else if (npc.getId() == 7528 && range == null)
+      WorldPoint coords = npc.getWorldLocation();
+    } else if (npc.getId() == NpcID.RAIDS_VANGUARD_RANGED && range == null)
       range = npc;
-    else if (npc.getId() == 7529 && mage == null)
+    else if (npc.getId() == NpcID.RAIDS_VANGUARD_RANGED && mage == null)
       mage = npc;
-    else if (npc.getId() == 7526) {
+    else if (npc.getId() == NpcID.RAIDS_VANGUARD_WALKING) {
       if (npc == melee) {
         melhp_fine = Math.min(solo_base_hp, melhp_fine + 1);
       } else if (npc == range) {
@@ -116,9 +120,10 @@ public class CoxVanguardsPlugin extends Plugin {
   @Subscribe
   public void onNpcDespawned(NpcDespawned e) {
     NPC npc = e.getNpc();
-    if (npc == melee)
+    if (npc == melee) {
       melee = null;
     else if (npc == range)
+    } else if (npc == range)
       range = null;
     else if (npc == mage)
       mage = null;
@@ -155,13 +160,13 @@ public class CoxVanguardsPlugin extends Plugin {
   }
 
   boolean isSolo() {
-    return client.getVarbitValue(9540) == 1;
+    return client.getVarbitValue(VarbitID.RAIDS_CLIENT_PARTYSIZE_SCALED) == 1;
   }
 
   int getSoloBaseHp() {
     int base_hp = 180;
     base_hp = base_hp * client.getLocalPlayer().getCombatLevel() / 126;
-    boolean cm = client.getVarbitValue(6385) != 0;
+    boolean cm = client.getVarbitValue(VarbitID.RAIDS_CHALLENGE_MODE) != 0;
     if (cm)
       base_hp = base_hp * 3 / 2;
 
