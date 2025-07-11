@@ -24,22 +24,32 @@ public interface CoxVanguardsConfig extends Config {
     return true;
   }
 
-  @ConfigItem(position = 3, keyName = "showDatabox", name = "Show HPs in a databox", description = "Show Vanguard HPs databox")
+  @ConfigItem(position = 3, keyName = "wanderRange", name ="Show melee wander range", description = "Show how far you need to go before losing agro from melee")
+  default boolean wanderRange() {
+    return false;
+  }
+
+  @ConfigItem(position = 4, keyName = "showDatabox", name = "Show HPs in a databox", description = "Show Vanguard HPs databox")
   default boolean showDatabox() {
     return false;
   }
 
-  @ConfigItem(position = 4, keyName = "meleeColor", name = "Melee Vanguard color", description = "Highlight color for melee Vanguard")
+  @ConfigItem(position = 5, keyName = "meleeColor", name = "Melee Vanguard color", description = "Highlight color for melee Vanguard")
   default Color getMeleeColor() {
     return Color.RED;
   }
 
-  @ConfigItem(position = 5, keyName = "rangeColor", name = "Range Vanguard color", description = "Highlight color for range Vanguard")
+  @ConfigItem(position = 5, keyName = "wanderColor", name = "Melee Vanguard wander color", description = "Highlight color for melee Vanguard wander range")
+  default Color getMeleeWanderColor() {
+    return new Color(0xC35364);
+  }
+
+  @ConfigItem(position = 6, keyName = "rangeColor", name = "Range Vanguard color", description = "Highlight color for range Vanguard")
   default Color getRangeColor() {
     return Color.GREEN;
   }
 
-  @ConfigItem(position = 6, keyName = "mageColor", name = "Mage Vanguard color", description = "Highlight color for mage Vanguard")
+  @ConfigItem(position = 7, keyName = "mageColor", name = "Mage Vanguard color", description = "Highlight color for mage Vanguard")
   default Color getMageColor() {
     return Color.CYAN;
   }

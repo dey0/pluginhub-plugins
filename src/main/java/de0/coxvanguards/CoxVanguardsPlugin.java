@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.HitsplatID;
 import net.runelite.api.NPC;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.HitsplatApplied;
@@ -38,6 +39,8 @@ public class CoxVanguardsPlugin extends Plugin {
   private boolean in_raid;
 
   int solo_base_hp;
+
+  WorldPoint meleeSpawn;
 
   NPC melee, range, mage;
   int melhp, rnghp, maghp;
@@ -87,24 +90,26 @@ public class CoxVanguardsPlugin extends Plugin {
   @Subscribe
   public void onNpcSpawned(NpcSpawned e) {
     NPC npc = e.getNpc();
-    if (melee == null && npc.getId() == NpcID.RAIDS_VANGUARD_MELEE)
+    if (melee == null && npc.getId() == NpcID.RAIDS_VANGUARD_MELEE) {
       melee = npc;
-    else if (range == null && npc.getId() == NpcID.RAIDS_VANGUARD_RANGED)
+    } else if (range == null && npc.getId() == NpcID.RAIDS_VANGUARD_RANGED)
       range = npc;
-    else if (mage == null && npc.getId() == 7529)
+    else if (mage == null && npc.getId() == NpcID.RAIDS_VANGUARD_MAGIC)
       mage = npc;
   }
 
   @Subscribe
   public void onNpcChanged(NpcChanged e) {
     NPC npc = e.getNpc();
-    if (npc.getId() == NpcID.RAIDS_VANGUARD_MELEE && melee == null) {
-      melee = npc;
-    else if (npc.getId() == 7528 && range == null)
-      WorldPoint coords = npc.getWorldLocation();
+    if (npc.getId() == NpcID.RAIDS_VANGUARD_MELEE) {
+      if (melee == null)
+        melee = npc;
+      // Only set the melee location on digs, can have been dragged if late otherwise.
+      if (meleeSpawn == null)
+        meleeSpawn = npc.getWorldLocation().dx(1).dy(1);
     } else if (npc.getId() == NpcID.RAIDS_VANGUARD_RANGED && range == null)
       range = npc;
-    else if (npc.getId() == NpcID.RAIDS_VANGUARD_RANGED && mage == null)
+    else if (npc.getId() == NpcID.RAIDS_VANGUARD_MAGIC && mage == null)
       mage = npc;
     else if (npc.getId() == NpcID.RAIDS_VANGUARD_WALKING) {
       if (npc == melee) {
@@ -122,7 +127,7 @@ public class CoxVanguardsPlugin extends Plugin {
     NPC npc = e.getNpc();
     if (npc == melee) {
       melee = null;
-    else if (npc == range)
+      meleeSpawn = null;
     } else if (npc == range)
       range = null;
     else if (npc == mage)

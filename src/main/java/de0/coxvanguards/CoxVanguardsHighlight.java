@@ -1,14 +1,15 @@
 package de0.coxvanguards;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Shape;
+import java.awt.*;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
-import net.runelite.api.NPC;
+import lombok.NonNull;
+import net.runelite.api.*;
 import net.runelite.api.Point;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -20,14 +21,17 @@ import static java.lang.Math.min;
 
 public class CoxVanguardsHighlight extends Overlay {
 
+  @Inject
+  private Client client;
+
+  @Inject
   private CoxVanguardsPlugin plugin;
+
+  @Inject
   private CoxVanguardsConfig config;
 
   @Inject
-  public CoxVanguardsHighlight(CoxVanguardsPlugin plugin, CoxVanguardsConfig config) {
-    super(plugin);
-    this.plugin = plugin;
-    this.config = config;
+  protected void init() {
     setPosition(OverlayPosition.DYNAMIC);
     setLayer(OverlayLayer.ABOVE_SCENE);
   }
@@ -43,7 +47,59 @@ public class CoxVanguardsHighlight extends Overlay {
     if (plugin.mage != null)
       renderVanguard(plugin.mage, plugin.maghp, plugin.maghp_fine, g,
           config.getMageColor());
+    if (plugin.meleeSpawn != null && config.wanderRange()) {
+      renderBox(g, plugin.meleeSpawn);
+    }
     return null;
+  }
+
+  private Point getTileCorner(Client client, WorldView vw, WorldPoint wp, int plane, int cornerIndex)
+  {
+    LocalPoint lp = LocalPoint.fromWorld(vw, wp);
+    if (lp == null)
+    {
+      return null;
+    }
+
+    Polygon poly = Perspective.getCanvasTilePoly(client, lp, plane);
+    if (poly == null || poly.npoints < 4)
+    {
+      return null;
+    }
+
+    // Indices: 0 = TL, 1 = TR, 2 = BR, 3 = BL
+    return new Point(poly.xpoints[cornerIndex], poly.ypoints[cornerIndex]);
+  }
+
+  private void renderBox(Graphics2D g, @NonNull WorldPoint spawn) {
+    WorldView vw = client.getWorldView(-1);
+    int plane = vw.getPlane();
+    int radius = 9;
+
+    // Define the 4 corner tiles of the square
+    WorldPoint topLeft = spawn.dx(-radius).dy(-radius);
+    WorldPoint topRight = spawn.dx(radius).dy(-radius);
+    WorldPoint bottomRight = spawn.dx(radius).dy(radius);
+    WorldPoint bottomLeft = spawn.dx(-radius).dy(radius);
+
+    // Get the relevant corners of each tile (see note below)
+    Point tl = getTileCorner(client, vw, topLeft, plane, 0); // Top-left
+    Point tr = getTileCorner(client, vw, topRight, plane, 1); // Top-right
+    Point br = getTileCorner(client, vw, bottomRight, plane, 2); // Bottom-right
+    Point bl = getTileCorner(client, vw, bottomLeft, plane, 3); // Bottom-left
+
+    if (tl != null && tr != null && br != null && bl != null)
+    {
+      Polygon outline = new Polygon();
+      outline.addPoint(tl.getX(), tl.getY());
+      outline.addPoint(tr.getX(), tr.getY());
+      outline.addPoint(br.getX(), br.getY());
+      outline.addPoint(bl.getX(), bl.getY());
+
+      g.setColor(config.getMeleeWanderColor());
+      g.drawPolygon(outline);
+      g.drawPolygon(Perspective.getCanvasTilePoly(client, LocalPoint.fromWorld(vw, spawn)));
+    }
   }
 
   private void renderVanguard(NPC van, int last_hp, int hp_fine, Graphics2D g,
