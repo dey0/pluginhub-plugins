@@ -142,7 +142,7 @@ public class CoxVanguardsPlugin extends Plugin {
       this.rnghp_fine = solo_base_hp;
       this.maghp_fine = solo_base_hp;
     } else if (hs == HitsplatID.DAMAGE_ME || hs == HitsplatID.DAMAGE_OTHER
-        || hs == HitsplatID.DAMAGE_MAX_ME) {
+        || hs == HitsplatID.DAMAGE_MAX_ME || hs == HitsplatID.BURN) {
       int amt = e.getHitsplat().getAmount();
       if (npc == melee) {
         this.melhp_fine -= amt;
