@@ -44,4 +44,14 @@ public interface CoxVanguardsConfig extends Config {
     return Color.CYAN;
   }
 
+  @ConfigItem(position = 7, keyName = "wanderRange", name ="Show melee wander range", description = "Show how far you need to go before losing agro from melee")
+  default boolean wanderRange() {
+    return false;
+  }
+
+  @ConfigItem(position = 8, keyName = "wanderColor", name = "Melee Vanguard wander color", description = "Highlight color for melee Vanguard wander range")
+  default Color getMeleeWanderColor() {
+    return new Color(0xC35364);
+  }
+
 }

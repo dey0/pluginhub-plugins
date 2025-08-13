@@ -23,6 +23,13 @@
 ![Example image](https://i.imgur.com/sLfV7bA.png)
 
 ## Changelog
+#### 13/08/2025
+- Fix burn damage not being tracked at Vanguards. @Koekenpann
+- Add melee aggro range at Vanguards. @vikke1234
+
+#### 13/07/2024
+- Remove thieving check success rate.
+
 #### 30/04/2024
 - Fixed Vanguards HP in scaled solo raids.
 - Fixed floor end timer bug.
