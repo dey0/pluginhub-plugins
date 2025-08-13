@@ -1,7 +1,6 @@
 package de0.coxvanguards;
 
 import java.awt.*;
-import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -103,7 +102,7 @@ public class CoxVanguardsHighlight extends Overlay {
   }
 
   private void renderVanguard(NPC van, int last_hp, int hp_fine, Graphics2D g,
-      Color c) {
+                              Color c) {
     if (van.getId() < 7525 || van.getId() > 7529)
       return;
 
