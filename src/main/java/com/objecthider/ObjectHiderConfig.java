@@ -28,4 +28,9 @@ public interface ObjectHiderConfig extends Config {
   default boolean getHideAll() {
     return false;
   }
+
+  @ConfigItem(keyName = "hideMinimapIcons", name = "Hide Minimap Icons", description = "Whether to hide all minimap icons regardless of the list", position = 3)
+  default boolean getHideMinimapIcons() {
+    return false;
+  }
 }

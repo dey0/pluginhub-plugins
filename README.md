@@ -20,3 +20,6 @@ The way to select Ground Objects to hide is to hold the key binding (not bound b
 NOTE: The list of `IDs to hide` will not be updated immediately. Re-open the plugin's settings to refresh the list.
 
 ![](readme2.png)
+
+## Update Log
+2025/11/01 - Updated for new RuneLite renderer & fix bugs [#12](/../../issues/12) [#15](/../../issues/15)
