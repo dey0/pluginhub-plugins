@@ -2,7 +2,10 @@ package com.objecthider;
 
 import com.google.inject.Provides;
 import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.GroundObjectDespawned;
+import net.runelite.api.events.GroundObjectSpawned;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.callback.RenderCallbackManager;
 import net.runelite.client.chat.ChatMessageBuilder;
@@ -64,6 +67,8 @@ public class ObjectHiderPlugin extends Plugin {
   private ObjectHiderRenderCallback callback;
 
   public boolean selectGroundObjectMode = false;
+
+  private HashMap<WorldPoint, GroundObject> hiddenObjects = new HashMap<>();
 
   /**
    * groundObjectsKeyListener is an instance of `HotkeyListener` designed to let
@@ -165,13 +170,12 @@ public class ObjectHiderPlugin extends Plugin {
 
   @Override
   protected void startUp() {
+    clientThread.invoke(this::rebuildObjects);
     keyManager.registerKeyListener(groundObjectsKeyListener);
     mouseManager.registerMouseListener(mouseListener);
     overlayManager.add(overlay);
     renderCallbackManager.register(callback);
 
-    callback.setHideAll(config.getHideAll());
-    callback.setHideMapIcons(config.getHideMinimapIcons());
     callback.setTilesToHide(this.getGroundObjects());
     this.tryReloadScene();
   }
@@ -182,12 +186,136 @@ public class ObjectHiderPlugin extends Plugin {
     keyManager.unregisterKeyListener(groundObjectsKeyListener);
     mouseManager.unregisterMouseListener(mouseListener);
     overlayManager.remove(overlay);
+    unhideAllGroundObjects();
+    this.hiddenObjects.clear();
     renderCallbackManager.unregister(callback);
 
-    callback.setHideAll(false);
-    callback.setHideMapIcons(false);
     callback.clearHiddenTiles();
     this.tryReloadScene();
+  }
+
+  /**
+   * unhideAllGroundObjects iterates through the scene and restores any Ground
+   * Objects that have been hidden by the plugin.
+   */
+  private void unhideAllGroundObjects() {
+    final Scene scene = client.getScene();
+    final Tile[][][] tiles = scene.getTiles();
+    // for each tile:
+    if (tiles != null) {
+      for (int plane = 0; plane < tiles.length; plane++) {
+        for (int x = 0; x < tiles[plane].length; x++) {
+          for (int y = 0; y < tiles[plane][x].length; y++) {
+            // if it is null, go to next one:
+            if (tiles[plane][x][y] == null) {
+              continue;
+            }
+            final WorldPoint location = tiles[plane][x][y].getWorldLocation();
+            // if we have hidden a Ground Object on that tile, restore it:
+            if (this.hiddenObjects.containsKey(location)) {
+              tiles[plane][x][y].setGroundObject(this.hiddenObjects.get(location));
+              // and make sure to sync the list:
+              this.hiddenObjects.remove(location);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * hideGroundObjectOnTile removes the Ground Object `obj`, if it is present ,
+   * from tile `tile`. It is stored in memory before removing, so that it can be
+   * restored if need be later on.
+   * <p>
+   * Note that, as a safeguard, Ground Objects that are intractable will not be
+   * hidden. The return value will be false in that case.
+   * <p>
+   * Certain disallowed objects are also prevented.
+   *
+   * @param tile - the Tile to remove from
+   * @param obj  - the Ground Object to remove
+   * @return whether the operation was successful
+   */
+  private boolean hideGroundObjectOnTile(Tile tile, GroundObject obj) {
+    // if either are null, don't do anything
+    if (tile == null || obj == null) {
+      return false;
+    }
+
+    // disallow hiding in Sotetseg regions
+    for (int i : client.getMapRegions()) {
+      if (i == 13123 || i == 13379) {
+        return false;
+      }
+    }
+
+    final ObjectComposition oc = client.getObjectDefinition(obj.getId());
+    if (oc != null) {
+      if (Arrays.stream(oc.getActions()).anyMatch(a -> a != null && !a.equals("Examine"))) {
+        return false;
+      }
+    }
+    hiddenObjects.put(tile.getWorldLocation(), obj);
+    tile.setGroundObject(null);
+    return true;
+  }
+
+  /**
+   * rebuildObjects iterates through the scene to look for Ground Objects to hide.
+   * Further, if any Ground Objects were previously hidden that should not be,
+   * they are restored. Typically called on a config change.
+   */
+  private void rebuildObjects() {
+    final Scene scene = client.getScene();
+    final Tile[][][] tiles = scene.getTiles();
+
+    if (tiles != null) {
+      for (int plane = 0; plane < tiles.length; plane++) {
+        for (int x = 0; x < tiles[plane].length; x++) {
+          for (int y = 0; y < tiles[plane][x].length; y++) {
+            final Tile currentTile = tiles[plane][x][y];
+            if (currentTile == null) {
+              continue;
+            }
+            // look for a matching Ground Object on that tile:
+            final GroundObject groundObj = currentTile.getGroundObject();
+            if (groundObj == null) {
+              // have we hidden something that shouldn't be hidden any more?
+              // look through `this.hiddenObjects` for this tile, and potentially restore:
+              if (this.hiddenObjects.containsKey(currentTile.getWorldLocation())) {
+                GroundObject oHidden = this.hiddenObjects.get(currentTile.getWorldLocation());
+                if (!getGroundObjects().contains(oHidden.getId())) {
+                  currentTile.setGroundObject(oHidden);
+                  this.hiddenObjects.remove(currentTile.getWorldLocation());
+                }
+              }
+              continue;
+            }
+
+            ObjectComposition oc = client.getObjectDefinition(groundObj.getId());
+            if (oc == null) {
+              continue;
+            }
+
+            if (config.getHideMinimapIcons() && oc.getMapIconId() != -1) {
+              hideGroundObjectOnTile(currentTile, currentTile.getGroundObject());
+              continue;
+            }
+
+            if (config.getHideAll() && oc.getMapIconId() == -1) {
+              int[] imposters = oc.getImpostorIds();
+              if (imposters == null || imposters.length == 0) {
+                hideGroundObjectOnTile(currentTile, currentTile.getGroundObject());
+              }
+            } // tile has a ground object, so maybe add it to the hide list
+            else if (getGroundObjects().contains(groundObj.getId())) {
+              hideGroundObjectOnTile(currentTile, groundObj);
+            }
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -224,6 +352,42 @@ public class ObjectHiderPlugin extends Plugin {
   }
 
   /**
+   * onGroundObjectSpawned listens for newly-spawned Ground Objects in case they
+   * should be hidden.
+   *
+   * @param event - the spawn event
+   */
+  @Subscribe
+  public void onGroundObjectSpawned(GroundObjectSpawned event) {
+    final GroundObject obj = event.getGroundObject();
+    final Tile currentTile = event.getTile();
+
+    if (obj == null || currentTile == null) {
+      return;
+    }
+
+    ObjectComposition oc = client.getObjectDefinition(obj.getId());
+    if (oc == null) {
+      return;
+    }
+
+    if (config.getHideMinimapIcons() && oc.getMapIconId() != -1) {
+      hideGroundObjectOnTile(currentTile, currentTile.getGroundObject());
+      return;
+    }
+
+    if (config.getHideAll() && oc.getMapIconId() == -1) {
+      int[] imposters = oc.getImpostorIds();
+      if (imposters == null || imposters.length == 0) {
+        hideGroundObjectOnTile(currentTile, currentTile.getGroundObject());
+      }
+    } // tile has a ground object, so maybe add it to the hide list
+    else if (getGroundObjects().contains(obj.getId())) {
+      hideGroundObjectOnTile(currentTile, obj);
+    }
+  }
+
+  /**
    * onGameTick listens for game ticks to schedule a regular garbage collection of
    * Game Objects that are no longer in the scene.
    *
@@ -231,10 +395,43 @@ public class ObjectHiderPlugin extends Plugin {
    */
   @Subscribe
   public void onGameTick(GameTick event) {
+    if (client.getTickCount() % 100 == 0) { // every 60 seconds roughly
+      // to avoid the list of hidden objects growing boundlessly as a player moves
+      // around, we perform
+      // a regular garbage collection. GC if:
+      // - world location of hidden object is no longer in scene
+      final List<WorldPoint> toRemove = new ArrayList<>();
+      for (WorldPoint wp : this.hiddenObjects.keySet()) {
+        if (!wp.isInScene(client)) {
+          toRemove.add(wp);
+        }
+      }
+      for (WorldPoint wp : toRemove) {
+        this.hiddenObjects.remove(wp);
+      }
+    }
     if (selectGroundObjectMode && !clientUI.isFocused()) {
       ChatMessageBuilder message = new ChatMessageBuilder().append("Ground Object Hider hotkey released.");
       chatMessageManager.queue(QueuedMessage.builder().type(ChatMessageType.CONSOLE).runeLiteFormattedMessage(message.build()).build());
       selectGroundObjectMode = false;
+    }
+  }
+
+  /**
+   * onGroundObjectDepawned listens for newly-despawned Ground Objects in case
+   * they should be removed from the in-memory list.
+   *
+   * @param event - the despawn event
+   */
+  @Subscribe
+  public void onGroundObjectDespawned(GroundObjectDespawned event) {
+    final Tile t = event.getTile();
+    if (t == null) {
+      return;
+    }
+    final WorldPoint loc = t.getWorldLocation();
+    if (loc != null) {
+      this.hiddenObjects.remove(loc);
     }
   }
 
@@ -249,15 +446,15 @@ public class ObjectHiderPlugin extends Plugin {
     if (!configChanged.getGroup().equals("objecthider")) {
       return;
     }
-    callback.setHideAll(config.getHideAll());
-    callback.setHideMapIcons(config.getHideMinimapIcons());
+    clientThread.invoke(this::rebuildObjects);
     callback.setTilesToHide(this.getGroundObjects());
     this.tryReloadScene();
   }
 
   private void tryReloadScene() {
     clientThread.invokeLater(() -> {
-      if (client.getGameState() == GameState.LOGGED_IN) client.setGameState(GameState.LOADING);
+      if (client.getGameState() == GameState.LOGGED_IN)
+        client.setGameState(GameState.LOADING);
     });
   }
 }

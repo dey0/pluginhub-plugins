@@ -29,7 +29,7 @@ public class ObjectHiderOverlay extends Overlay {
     // position, layer + priority copied from `plugins.tileindicator`
     setPosition(OverlayPosition.DYNAMIC);
     setLayer(OverlayLayer.ABOVE_SCENE);
-    setPriority(OverlayPriority.MED);
+    setPriority(Overlay.PRIORITY_MED);
   }
 
   @Override

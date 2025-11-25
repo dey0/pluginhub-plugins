@@ -22,4 +22,5 @@ NOTE: The list of `IDs to hide` will not be updated immediately. Re-open the plu
 ![](readme2.png)
 
 ## Update Log
+2025/11/25 - Fix startup crash & revert some behaviour to work without new RuneLite renderer.
 2025/11/01 - Updated for new RuneLite renderer & fix bugs [#12](/../../issues/12) [#15](/../../issues/15)
