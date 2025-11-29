@@ -2,6 +2,7 @@ package com.objecthider;
 
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
+import net.runelite.api.WorldView;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -34,10 +35,13 @@ public class ObjectHiderOverlay extends Overlay {
 
   @Override
   public Dimension render(Graphics2D graphics) {
-    if (plugin.selectGroundObjectMode && client.getSelectedSceneTile() != null) {
+    WorldView wv = client.getTopLevelWorldView();
+    if (wv == null) return null;
+
+    if (plugin.selectGroundObjectMode && wv.getSelectedSceneTile() != null) {
       // create a polygon
       final Polygon poly = Perspective.getCanvasTilePoly(client,
-          client.getSelectedSceneTile().getLocalLocation());
+        wv.getSelectedSceneTile().getLocalLocation());
       if (poly != null) {
         // and render it
         OverlayUtil.renderPolygon(graphics, poly, Color.MAGENTA);
