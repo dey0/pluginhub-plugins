@@ -214,8 +214,11 @@ public class ObjectHiderPlugin extends Plugin {
     if (oc == null) return;
 
     // Handle map icons first
-    if (oc.getMapIconId() != -1 && !config.getHideMinimapIcons()) {
-      tile.setGroundObject(null);
+    if (oc.getMapIconId() != -1) {
+      boolean hideMapIcons = config.getHideMinimapIcons() || m_objectsToHide.contains(groundObjectId);
+      if (hideMapIcons) {
+        tile.setGroundObject(null);
+      }
       return;
     }
 
@@ -327,7 +330,7 @@ public class ObjectHiderPlugin extends Plugin {
       callback.setTilesToHide(this.getGroundObjects());
 
       // If objects to hide is the key, check if we gained an object. If so, the keyListener has handled it already.
-      if ((!cachedObjects.equals(m_objectsToHide)) && m_objectsToHide.containsAll(cachedObjects)) {
+      if (selectGroundObjectMode && (!cachedObjects.equals(m_objectsToHide)) && m_objectsToHide.containsAll(cachedObjects)) {
         return;
       }
     }
