@@ -35,22 +35,22 @@ public class ObjectHiderRenderCallback implements RenderCallback {
     if (Arrays.stream(wv.getMapRegions()).anyMatch(n -> (n == 13123 || n == 13379)))
       return RenderCallback.super.drawTile(scene, tile);
 
-//    ObjectComposition oc = client.getObjectDefinition(groundObjectId);
-//    if (oc == null) return RenderCallback.super.drawTile(scene, tile);
-//
-//    // Handle map icons first
-//    if (oc.getMapIconId() != -1 && !hideMapIcons) {
-//      tile.setGroundObject(null);
-//      return RenderCallback.super.drawTile(scene, tile);
-//    }
+    ObjectComposition oc = client.getObjectDefinition(groundObjectId);
+    if (oc == null) return RenderCallback.super.drawTile(scene, tile);
+
+    // Handle map icons first
+    if (oc.getMapIconId() != -1 && !hideMapIcons) {
+      tile.setGroundObject(null);
+      return RenderCallback.super.drawTile(scene, tile);
+    }
 
     if (hideAll) {
       // For hide all, don't hide if there are imposters or actions
-//      int[] imposters = oc.getImpostorIds();
-//      String[] actions = oc.getActions();
-//      if ((imposters == null || imposters.length == 0) && (actions == null || Arrays.stream(actions).allMatch(Objects::isNull))) {
+      int[] imposters = oc.getImpostorIds();
+      String[] actions = oc.getActions();
+      if ((imposters == null || imposters.length == 0) && (actions == null || Arrays.stream(actions).allMatch(Objects::isNull))) {
       tile.setGroundObject(null);
-//      }
+      }
     } else if (idsToHide.contains(groundObject.getId())) {
       tile.setGroundObject(null);
     }
