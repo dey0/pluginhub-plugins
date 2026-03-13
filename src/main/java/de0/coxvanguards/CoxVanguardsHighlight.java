@@ -71,7 +71,7 @@ public class CoxVanguardsHighlight extends Overlay {
   }
 
   private void renderBox(Graphics2D g, @NonNull WorldPoint spawn) {
-    WorldView vw = client.getWorldView(-1);
+    WorldView vw = client.getWorldView(WorldView.TOPLEVEL);
     int plane = vw.getPlane();
     int radius = 9;
 
