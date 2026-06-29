@@ -9,7 +9,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-@PluginDescriptor(name = "Loading Lines", description = "Draw loading lines on screen", enabledByDefault = false)
+@PluginDescriptor(name = "Loading Lines", description = "Draw loading lines on screen")
 public class LoadingLinesPlugin extends Plugin {
 
   @Inject
