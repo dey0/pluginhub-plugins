@@ -145,8 +145,8 @@ public class CoxVanguardsHighlight extends Overlay {
     Point point = npc.getCanvasTextLocation(g, str, npc.getLogicalHeight());
     if (point == null)
       return;
-    point = new Point(point.getX(), point.getY() + 20);
-    g.setFont(FontManager.getRunescapeBoldFont());
+    point = new Point(point.getX(), point.getY() + 20 - config.heightOffset());
+    g.setFont(FontManager.getRunescapeBoldFont().deriveFont((float) config.fontSize()));
     OverlayUtil.renderTextLocation(g, point, str, c);
   }
 
