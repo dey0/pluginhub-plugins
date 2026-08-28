@@ -8,21 +8,25 @@
 - (Optional) Ice demon pop timer ends when the smoke puffs appear above the braziers
 - (Optional) Muttadile tree timer starts when previous room ended, or in regular raids, when the tendrils appeared
 
-![Example image](https://i.imgur.com/W79HWY2.png)
+![Example image](/readme/cox-timers.png)
 
 ## CoX Thieving
 *Solves bat and poison chests, as well as tracks and displays the amount of grubs found by raiders*
 - Estimates the number of grubs found by the other players in the raid, based on the expected value
 
-![Example image](https://i.imgur.com/7j4zAYa.png)
-![Example image](https://i.imgur.com/2Qfqj8K.png)
+![Example image](/readme/cox-thieving-1.png)
+![Example image](/readme/cox-thieving-2.png)
 
 ## CoX Vanguards
 *Highlights Vanguards of their respective color and shows their current HP*
 
-![Example image](https://i.imgur.com/sLfV7bA.png)
+![Example image](/readme/cox-vanguards.png)
 
 ## Changelog
+
+#### 28/08/2026
+- [Add config options for hp overlay text size and text offset](https://github.com/dey0/pluginhub-plugins/pull/37)
+
 #### 13/08/2025
 - Fix burn damage not being tracked at Vanguards. @Koekenpann
 - Add melee aggro range at Vanguards. @vikke1234

@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.ToIntFunction;
 import javax.inject.Inject;
+
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.InventoryID;
@@ -27,6 +29,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
+@Slf4j
 @PluginDescriptor(name = "CoX Thieving", description = "Finds bat chests and counts grubs at thieving room in CoX")
 public class CoxThievingPlugin extends Plugin {
 
@@ -86,7 +89,7 @@ public class CoxThievingPlugin extends Plugin {
         try {
           shutDown();
         } catch (Exception ex) {
-          ex.printStackTrace();
+          log.warn("Error shutting down CoX Thieving", ex);
         }
       return;
     }
